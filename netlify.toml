@@ -1,0 +1,21 @@
+# Configuração de build e redirecionamentos do Netlify para o BlinkGames
+
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# Redirecionamentos — garantem que todas as rotas funcionem em SPA e multi-page
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Headers de segurança básicos
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "no-referrer-when-downgrade"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
+    Content-Security-Policy = "default-src 'self' https:; script-src 'self' https: 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; font-src 'self' https: data:; connect-src 'self' https://SEU_BACKEND.onrender.com"

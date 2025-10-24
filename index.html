@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="BlinkGames — Rifas de games, consoles e periféricos com visual neon estilo GTA.">
+  <meta name="theme-color" content="#0a0d12">
+  <title>BlinkGames — Rifas de Games e Consoles</title>
+
+  <!-- Ícones e manifest -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Press+Start+2P&display=swap" rel="stylesheet">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/style.css" />
+
+  <!-- Scripts principais -->
+  <script type="module" src="js/app.js" defer></script>
+  <script type="module" src="js/pacman-bg.js" defer></script>
+</head>
+<body>
+  <!-- Canvas de fundo do Pac-Man -->
+  <canvas id="pacman-bg"></canvas>
+
+  <!-- Cabeçalho fixo -->
+  <header class="header">
+    <div class="logo">Blink<span>Games</span></div>
+    <button id="menu-toggle" aria-label="Abrir menu" class="menu-btn">
+      ☰
+    </button>
+    <nav class="nav" id="nav-menu">
+      <ul>
+        <li><a href="/index.html">Home</a></li>
+        <li><a href="/rifas.html">Rifas</a></li>
+        <li><a href="/vencedores.html">Vencedores</a></li>
+        <li><a href="/termos.html">Termos</a></li>
+        <li><a href="/sobre.html">Sobre</a></li>
+        <li><a href="/conta.html">Minha Conta</a></li>
+        <li><a href="/carrinho.html" class="cart-link">
+          <img src="img/icons/cart.svg" alt="Carrinho" class="cart-icon" />
+          <span id="cart-badge" class="badge">0</span>
+        </a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Seção hero -->
+  <section class="hero">
+    <h1>BlinkGames: te leva para a próxima fase!</h1>
+    <p>Rifas de games, consoles e periféricos — escolha seus números e aperte START!</p>
+    <a href="/rifas.html" class="btn-primary">Ver rifas ativas</a>
+  </section>
+
+  <!-- Carrossel de rifas em destaque -->
+  <section class="featured">
+    <h2>Destaques</h2>
+    <div class="carousel" id="featured-carousel">
+      <!-- Cards serão renderizados dinamicamente via JS -->
+    </div>
+    <a href="/rifas.html" class="btn-secondary">Ver todas as rifas</a>
+  </section>
+
+  <!-- Rodapé -->
+  <footer class="footer">
+    <div class="footer-content">
+      <p>© 2025 BlinkGames — Todos os direitos reservados.</p>
+      <p>
+        <a href="mailto:blinkgamesoficial@hotmail.com">blinkgamesoficial@hotmail.com</a> |
+        <a href="https://instagram.com/blinkgamesoficial" target="_blank">@blinkgamesoficial</a>
+      </p>
+      <div class="pacman-toggle">
+        <label>
+          <input type="checkbox" id="toggle-animation" checked />
+          Animação Pac-Man
+        </label>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

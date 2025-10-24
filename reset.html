@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Redefinir senha — BlinkGames">
+  <title>Redefinir Senha — BlinkGames</title>
+
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css" />
+
+  <script type="module" src="js/app.js" defer></script>
+  <script type="module" src="js/pacman-bg.js" defer></script>
+  <script type="module" src="js/auth.js" defer></script>
+</head>
+<body>
+  <canvas id="pacman-bg" aria-hidden="true"></canvas>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="logo">Blink<span>Games</span></div>
+    <button id="menu-toggle" aria-label="Abrir menu" class="menu-btn">☰</button>
+    <nav class="nav" id="nav-menu">
+      <ul>
+        <li><a href="/index.html">Home</a></li>
+        <li><a href="/rifas.html">Rifas</a></li>
+        <li><a href="/vencedores.html">Vencedores</a></li>
+        <li><a href="/termos.html">Termos</a></li>
+        <li><a href="/sobre.html">Sobre</a></li>
+        <li><a href="/conta.html">Minha Conta</a></li>
+        <li>
+          <a href="/carrinho.html" class="cart-link">
+            <img src="img/icons/cart.svg" alt="Carrinho" class="cart-icon" />
+            <span id="cart-badge" class="badge">0</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="container page">
+    <section class="auth-section">
+      <form id="reset-form" class="auth-form">
+        <h2>Redefinir Senha</h2>
+        <p class="subtitle">Digite sua nova senha para continuar.</p>
+
+        <label>Nova Senha</label>
+        <input type="password" id="new-password" minlength="6" required />
+
+        <label>Confirmar Nova Senha</label>
+        <input type="password" id="confirm-password" minlength="6" required />
+
+        <button type="submit" class="btn-primary">Salvar nova senha</button>
+
+        <div id="reset-message" class="msg" hidden></div>
+      </form>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-content">
+      <p>© 2025 BlinkGames — Todos os direitos reservados.</p>
+      <p>
+        <a href="mailto:blinkgamesoficial@hotmail.com">blinkgamesoficial@hotmail.com</a> |
+        <a href="https://instagram.com/blinkgamesoficial" target="_blank">@blinkgamesoficial</a>
+      </p>
+      <div class="pacman-toggle">
+        <label>
+          <input type="checkbox" id="toggle-animation" checked />
+          Animação Pac-Man
+        </label>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

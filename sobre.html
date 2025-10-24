@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Sobre a BlinkGames — Rifas de games e periféricos.">
+  <title>Sobre — BlinkGames</title>
+
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css" />
+
+  <script type="module" src="js/app.js" defer></script>
+  <script type="module" src="js/pacman-bg.js" defer></script>
+</head>
+<body>
+  <canvas id="pacman-bg" aria-hidden="true"></canvas>
+
+  <header class="header">
+    <div class="logo">Blink<span>Games</span></div>
+    <button id="menu-toggle" aria-label="Abrir menu" class="menu-btn">☰</button>
+    <nav class="nav" id="nav-menu">
+      <ul>
+        <li><a href="/index.html">Home</a></li>
+        <li><a href="/rifas.html">Rifas</a></li>
+        <li><a href="/vencedores.html">Vencedores</a></li>
+        <li><a href="/termos.html">Termos</a></li>
+        <li><a class="active" href="/sobre.html">Sobre</a></li>
+        <li><a href="/conta.html">Minha Conta</a></li>
+        <li>
+          <a href="/carrinho.html" class="cart-link">
+            <img src="img/icons/cart.svg" alt="Carrinho" class="cart-icon" />
+            <span id="cart-badge" class="badge">0</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="container page">
+    <header class="page-header">
+      <h1>Sobre a BlinkGames</h1>
+      <p class="subtitle">Transparência, inovação e paixão por games.</p>
+    </header>
+
+    <section class="about-section">
+      <p>
+        A <strong>BlinkGames</strong> nasceu da união entre tecnologia e entretenimento.
+        Nosso objetivo é transformar a experiência de rifas online — oferecendo
+        <strong>segurança, transparência e diversão</strong> em cada sorteio.
+      </p>
+
+      <p>
+        Aqui, cada número é uma chance de realizar sonhos gamer: consoles, jogos, periféricos
+        e setups completos — tudo com sorteios auditados pela <strong>Loteria Federal</strong>.
+      </p>
+
+      <p>
+        Utilizamos as tecnologias mais modernas (Node.js, MongoDB e integração oficial com Mercado Pago)
+        para garantir uma plataforma confiável e rápida, com animações leves e um visual inspirado
+        no universo <strong>neon de GTA 6</strong>.
+      </p>
+
+      <h2>Nossa missão</h2>
+      <p>
+        Levar a emoção dos games e da sorte a todos os apaixonados por tecnologia, de forma acessível
+        e totalmente segura.
+      </p>
+
+      <h2>Valores</h2>
+      <ul>
+        <li>🎮 Transparência e confiança</li>
+        <li>⚡ Inovação e performance</li>
+        <li>💬 Atendimento humano e direto</li>
+        <li>🌐 Segurança e privacidade dos dados</li>
+      </ul>
+
+      <h2>Contato</h2>
+      <p>
+        📧 E-mail: <a href="mailto:blinkgamesoficial@hotmail.com">blinkgamesoficial@hotmail.com</a><br />
+        📸 Instagram: <a href="https://instagram.com/blinkgamesoficial" target="_blank">@blinkgamesoficial</a>
+      </p>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-content">
+      <p>© 2025 BlinkGames — Todos os direitos reservados.</p>
+      <p>
+        <a href="mailto:blinkgamesoficial@hotmail.com">blinkgamesoficial@hotmail.com</a> |
+        <a href="https://instagram.com/blinkgamesoficial" target="_blank">@blinkgamesoficial</a>
+      </p>
+      <div class="pacman-toggle">
+        <label>
+          <input type="checkbox" id="toggle-animation" checked />
+          Animação Pac-Man
+        </label>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

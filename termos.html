@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Termos e Condições — BlinkGames">
+  <title>Termos & Condições — BlinkGames</title>
+
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css" />
+
+  <script type="module" src="js/app.js" defer></script>
+  <script type="module" src="js/pacman-bg.js" defer></script>
+</head>
+<body>
+  <canvas id="pacman-bg" aria-hidden="true"></canvas>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="logo">Blink<span>Games</span></div>
+    <button id="menu-toggle" aria-label="Abrir menu" class="menu-btn">☰</button>
+    <nav class="nav" id="nav-menu">
+      <ul>
+        <li><a href="/index.html">Home</a></li>
+        <li><a href="/rifas.html">Rifas</a></li>
+        <li><a href="/vencedores.html">Vencedores</a></li>
+        <li><a class="active" href="/termos.html">Termos</a></li>
+        <li><a href="/sobre.html">Sobre</a></li>
+        <li><a href="/conta.html">Minha Conta</a></li>
+        <li>
+          <a href="/carrinho.html" class="cart-link">
+            <img src="img/icons/cart.svg" alt="Carrinho" class="cart-icon" />
+            <span id="cart-badge" class="badge">0</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="container page">
+    <header class="page-header">
+      <h1>Termos e Condições</h1>
+      <p class="subtitle">Leia com atenção antes de participar das rifas da BlinkGames.</p>
+    </header>
+
+    <section class="legal-text">
+      <h2>1. Regras Gerais</h2>
+      <p>
+        A BlinkGames realiza rifas de produtos novos e originais (consoles, jogos e periféricos).
+        A participação é restrita a maiores de 18 anos residentes no Brasil.
+      </p>
+
+      <h2>2. Sorteio</h2>
+      <p>
+        Todos os sorteios são auditados e baseados na <strong>Loteria Federal</strong>.
+        O número vencedor será determinado pelos 5 últimos dígitos do primeiro prêmio da extração correspondente.
+      </p>
+
+      <h2>3. Pagamento</h2>
+      <p>
+        O pagamento é processado de forma 100% segura através do <strong>Mercado Pago</strong>.
+        Não é exibida nenhuma chave PIX no site. Todo o fluxo é feito pelo checkout oficial do Mercado Pago.
+      </p>
+
+      <h2>4. Entrega</h2>
+      <p>
+        Os prêmios são enviados em até <strong>30 dias úteis</strong> após o sorteio, com nota fiscal e frete pago pela BlinkGames.
+      </p>
+
+      <h2>5. Cancelamento e Reembolso</h2>
+      <p>
+        Após a compra, <strong>não é possível solicitar reembolso</strong>.
+        Em caso de falha de pagamento, os números reservados voltam ao pool após 15 minutos.
+      </p>
+
+      <h2>6. Privacidade</h2>
+      <p>
+        Todos os dados pessoais (nome, CPF, telefone, e-mail e histórico de compras) são armazenados de forma segura e utilizados exclusivamente para fins de participação nas rifas.
+      </p>
+
+      <h2>7. Responsabilidade</h2>
+      <p>
+        A BlinkGames se isenta de qualquer responsabilidade por falhas de conexão, indisponibilidade de sistemas de terceiros (como o Mercado Pago) ou erros causados por uso indevido do site.
+      </p>
+
+      <h2>8. Concordância</h2>
+      <p>
+        Ao participar das rifas, o usuário declara estar de acordo com todos os termos aqui descritos.
+      </p>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-content">
+      <p>© 2025 BlinkGames — Todos os direitos reservados.</p>
+      <p>
+        <a href="mailto:blinkgamesoficial@hotmail.com">blinkgamesoficial@hotmail.com</a> |
+        <a href="https://instagram.com/blinkgamesoficial" target="_blank">@blinkgamesoficial</a>
+      </p>
+      <div class="pacman-toggle">
+        <label>
+          <input type="checkbox" id="toggle-animation" checked />
+          Animação Pac-Man
+        </label>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

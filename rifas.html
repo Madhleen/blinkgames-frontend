@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Rifas ativas — BlinkGames">
+  <title>Rifas — BlinkGames</title>
+
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Press+Start+2P&display=swap" rel="stylesheet">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/style.css" />
+
+  <!-- Scripts (ES Modules) -->
+  <script type="module" src="js/app.js" defer></script>
+  <script type="module" src="js/pacman-bg.js" defer></script>
+  <script type="module" src="js/raffles.js" defer></script>
+</head>
+<body>
+  <!-- Canvas de fundo (Pac-Man) -->
+  <canvas id="pacman-bg" aria-hidden="true"></canvas>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="logo">Blink<span>Games</span></div>
+    <button id="menu-toggle" aria-label="Abrir menu" class="menu-btn">☰</button>
+    <nav class="nav" id="nav-menu">
+      <ul>
+        <li><a href="/index.html">Home</a></li>
+        <li><a class="active" href="/rifas.html">Rifas</a></li>
+        <li><a href="/vencedores.html">Vencedores</a></li>
+        <li><a href="/termos.html">Termos</a></li>
+        <li><a href="/sobre.html">Sobre</a></li>
+        <li><a href="/conta.html">Minha Conta</a></li>
+        <li>
+          <a href="/carrinho.html" class="cart-link">
+            <img src="img/icons/cart.svg" alt="Carrinho" class="cart-icon" />
+            <span id="cart-badge" class="badge">0</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Conteúdo -->
+  <main class="container page">
+    <header class="page-header">
+      <h1>Rifas ativas</h1>
+      <p class="subtitle">Escolha sua rifa, veja o preço e a data do sorteio.</p>
+    </header>
+
+    <!-- Filtros simples (placeholder para futura expansão) -->
+    <section class="filters">
+      <div class="filters-row">
+        <input id="search-raffles" class="input" type="search" placeholder="Buscar por título..." aria-label="Buscar rifas" />
+        <select id="sort-raffles" class="select" aria-label="Ordenar rifas">
+          <option value="recent">Mais recentes</option>
+          <option value="price-asc">Preço: menor → maior</option>
+          <option value="price-desc">Preço: maior → menor</option>
+          <option value="date-asc">Sorteio: mais próximo</option>
+          <option value="date-desc">Sorteio: mais distante</option>
+        </select>
+      </div>
+    </section>
+
+    <!-- Grade de cards de rifas -->
+    <section id="raffles-grid" class="grid-cards" aria-live="polite">
+      <!-- Cards renderizados por js/raffles.js via API -->
+    </section>
+
+    <!-- Loader/estado vazio -->
+    <div id="raffles-empty" class="empty-state" hidden>
+      <p>Nenhuma rifa encontrada.</p>
+      <a href="/index.html" class="btn-secondary">Voltar para Home</a>
+    </div>
+  </main>
+
+  <!-- Rodapé -->
+  <footer class="footer">
+    <div class="footer-content">
+      <p>© 2025 BlinkGames — Todos os direitos reservados.</p>
+      <p>
+        <a href="mailto:blinkgamesoficial@hotmail.com">blinkgamesoficial@hotmail.com</a> |
+        <a href="https://instagram.com/blinkgamesoficial" target="_blank">@blinkgamesoficial</a>
+      </p>
+      <div class="pacman-toggle">
+        <label>
+          <input type="checkbox" id="toggle-animation" checked />
+          Animação Pac-Man
+        </label>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

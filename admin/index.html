@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Painel Administrativo — BlinkGames">
+  <title>Admin — BlinkGames</title>
+
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="../css/style.css" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Press+Start+2P&display=swap" rel="stylesheet">
+
+  <script type="module" src="../js/app.js" defer></script>
+  <script type="module" src="../js/admin.js" defer></script>
+</head>
+<body>
+  <main class="container page admin-page">
+    <h1>Painel Administrativo BlinkGames</h1>
+
+    <section class="admin-login" id="admin-login">
+      <h2>Acesso Restrito</h2>
+      <p>Digite a chave de administrador ou faça login:</p>
+      <input type="password" id="admin-key" placeholder="ADMIN_KEY" />
+      <button id="admin-access-btn" class="btn-primary">Entrar</button>
+      <div id="admin-login-msg"></div>
+    </section>
+
+    <section id="admin-dashboard" class="admin-dashboard" hidden>
+      <nav class="admin-nav">
+        <button data-tab="overview" class="admin-tab active">📊 Dashboard</button>
+        <button data-tab="users" class="admin-tab">👤 Usuários</button>
+        <button data-tab="raffles" class="admin-tab">🎟️ Rifas</button>
+        <button data-tab="payments" class="admin-tab">💰 Pagamentos</button>
+      </nav>
+
+      <div class="admin-content">
+        <!-- Dashboard -->
+        <div id="tab-overview" class="tab active">
+          <h2>Visão Geral</h2>
+          <div class="cards-grid" id="overview-cards">
+            <!-- Cards renderizados via JS -->
+          </div>
+        </div>
+
+        <!-- Usuários -->
+        <div id="tab-users" class="tab">
+          <h2>Usuários</h2>
+          <div class="table-container">
+            <table id="users-table">
+              <thead>
+                <tr>
+                  <th>Nome</th>
+                  <th>CPF</th>
+                  <th>Email</th>
+                  <th>Telefone</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <button id="export-users" class="btn-secondary">Exportar CSV</button>
+        </div>
+
+        <!-- Rifas -->
+        <div id="tab-raffles" class="tab">
+          <h2>Rifas</h2>
+          <button id="new-raffle" class="btn-primary">+ Nova Rifa</button>
+          <div id="raffles-list"></div>
+        </div>
+
+        <!-- Pagamentos -->
+        <div id="tab-payments" class="tab">
+          <h2>Pagamentos</h2>
+          <div class="table-container">
+            <table id="payments-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Usuário</th>
+                  <th>Valor</th>
+                  <th>Status</th>
+                  <th>Data</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <button id="export-payments" class="btn-secondary">Exportar CSV</button>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
