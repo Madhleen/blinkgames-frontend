@@ -45,15 +45,15 @@ async function request(path, method = 'GET', data = null, token = null) {
   }
 }
 
-// ============================================================
-// 🔐 Autenticação
-// ============================================================
+// 🔐 Autenticação (Login, Cadastro, Reset)
 export const AuthAPI = {
   register: (user) => request("/api/auth/register", "POST", user),
-  login: (credentials) => request('/auth/login', 'POST', credentials),
-  forgot: (email) => request('/auth/forgot', 'POST', { email }),
-  reset: (token, password) => request('/auth/reset', 'POST', { token, password }),
+  login: (credentials) => request("/api/auth/login", "POST", credentials),
+  forgot: (email) => request("/api/auth/forgot", "POST", { email }),
+  reset: (token, password) =>
+    request("/api/auth/reset", "POST", { token, password }),
 };
+
 
 // ============================================================
 // 🎟️ Rifas
