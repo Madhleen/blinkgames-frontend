@@ -1,0 +1,10 @@
+{
+  "name": "BlinkGames",
+  "short_name": "BlinkGames",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0015",
+  "theme_color": "#ff00c8",
+  "description": "Rifas de games e periféricos — BlinkGames"
+}
+
