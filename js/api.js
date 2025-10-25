@@ -9,13 +9,9 @@ const headers = {
   'Content-Type': 'application/json',
 };
 
-// ============================================================
-// 🧠 Função genérica de requisição
-// ============================================================
+// ====== Função genérica de requisição ======
 async function request(path, method = 'GET', data = null, token = null) {
-  // Garante que sempre haja uma barra separando a base e o path
   const url = `${BACKEND}${path.startsWith('/') ? '' : '/'}${path}`;
-
   const options = {
     method,
     headers: { ...headers },
@@ -26,71 +22,66 @@ async function request(path, method = 'GET', data = null, token = null) {
 
   try {
     const res = await fetch(url, options);
-
-    // Tenta ler o payload como JSON, mas aceita texto se não for
+    const text = await res.text();
     let payload;
+
     try {
-      payload = await res.clone().json();
+      payload = JSON.parse(text);
     } catch {
-      payload = await res.text();
+      payload = text;
     }
 
-    // Trata erros HTTP
     if (!res.ok) {
-      const msg = (payload && payload.message) || payload || `Erro ${res.status}`;
-      if (DEBUG)
-        console.error(`[BlinkGames API ${method}] ${url} — ${res.status} — ${msg}`);
-      return { error: true, status: res.status, message: msg };
+      const msg = payload?.message || `Erro ${res.status}`;
+      if (DEBUG) console.error(`[API] ${method} ${url} — ${msg}`);
+      return { error: true, message: msg, status: res.status };
     }
 
-    if (DEBUG)
-      console.log(`[BlinkGames API ${method}] ✅ OK: ${url}`, payload);
-
+    if (DEBUG) console.log(`[API OK] ${method} ${url}`, payload);
     return payload;
   } catch (err) {
-    if (DEBUG)
-      console.error(`[BlinkGames API ❌ ERRO] ${method} ${url} — ${err.message}`);
+    if (DEBUG) console.error(`[API FAIL] ${method} ${url} —`, err.message);
     return { error: true, message: err.message };
   }
 }
 
 // ============================================================
-// 🔐 Autenticação (Login, Cadastro, Reset)
+// 🔐 Autenticação
 // ============================================================
 export const AuthAPI = {
-  register: (user) => request('/api/auth/register', 'POST', user),
-  login: (credentials) => request('/api/auth/login', 'POST', credentials),
-  forgot: (email) => request('/api/auth/forgot', 'POST', { email }),
-  reset: (token, password) => request('/api/auth/reset', 'POST', { token, password }),
+  register: (user) => request('/auth/register', 'POST', user),
+  login: (credentials) => request('/auth/login', 'POST', credentials),
+  forgot: (email) => request('/auth/forgot', 'POST', { email }),
+  reset: (token, password) => request('/auth/reset', 'POST', { token, password }),
 };
 
 // ============================================================
 // 🎟️ Rifas
 // ============================================================
 export const RafflesAPI = {
-  getAll: () => request('/api/rifas'),
-  getById: (id) => request(`/api/rifas/${id}`),
+  getAll: () => request('/rifas'),
+  getById: (id) => request(`/rifas/${id}`),
 };
 
 // ============================================================
 // 💳 Checkout / Pagamentos
 // ============================================================
 export const CheckoutAPI = {
-  create: (cart, token) => request('/api/order/checkout', 'POST', { cart }, token),
+  create: (cart, token) => request('/order/checkout', 'POST', { cart }, token),
 };
 
 // ============================================================
-// 🛠️ Painel Admin
+// 🛠️ Admin
 // ============================================================
 export const AdminAPI = {
-  users: (token) => request('/api/admin/users', 'GET', null, token),
-  payments: (token) => request('/api/admin/payments', 'GET', null, token),
-  raffles: (token) => request('/api/admin/rifas', 'GET', null, token),
-  createRaffle: (data, token) => request('/api/admin/rifas', 'POST', data, token),
+  users: (token) => request('/admin/users', 'GET', null, token),
+  payments: (token) => request('/admin/payments', 'GET', null, token),
+  raffles: (token) => request('/admin/rifas', 'GET', null, token),
+  createRaffle: (data, token) => request('/admin/rifas', 'POST', data, token),
 };
 
 // ============================================================
-// ✅ Exportação padrão (para debug e imports globais)
+// ✅ Exportação padrão
 // ============================================================
 export default { AuthAPI, RafflesAPI, CheckoutAPI, AdminAPI };
 
