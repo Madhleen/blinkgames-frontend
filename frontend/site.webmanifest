@@ -1,11 +1,10 @@
 {
-  "name": "BlinkGames — Rifas de Games e Consoles",
+  "name": "BlinkGames \u2014 Rifas de Games e Consoles",
   "short_name": "BlinkGames",
   "start_url": "/index.html",
   "display": "standalone",
   "background_color": "#0a0d12",
   "theme_color": "#ff00c8",
-  "description": "Rifas de games, consoles e periféricos com visual neon estilo GTA.",
   "icons": [
     {
       "src": "img/icons/icon-192.png",
