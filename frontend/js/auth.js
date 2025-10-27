@@ -1,34 +1,3 @@
-
-import { mountHeader } from './header.js';
-import { AuthAPI } from './api.js';
-import { setToken } from './state.js';
-mountHeader();
-
-const login = document.getElementById('login-form');
-const register = document.getElementById('register-form');
-
-if(login){
-  login.addEventListener('submit', async e=>{
-    e.preventDefault();
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value.trim();
-    const res = await AuthAPI.login(email, password);
-    if(res && res.token){ setToken(res.token); alert('Bem-vindo!'); location.href='index.html'; }
-    else alert('Falha no login.');
-  });
-}
-
-if(register){
-  register.addEventListener('submit', async e=>{
-    e.preventDefault();
-    const payload = {
-      nome: document.getElementById('rname').value.trim(),
-      email: document.getElementById('remail').value.trim(),
-      password: document.getElementById('rpassword').value.trim(),
-      cpf: document.getElementById('rcpf').value.replace(/\D/g,'')
-    };
-    const res = await AuthAPI.register(payload);
-    if(res && (res.token || res._id)){ alert('Conta criada! Faça login.'); location.href='conta.html'; }
-    else alert('Falha no cadastro.');
-  });
-}
+import { mountHeader } from './header.js'; import { AuthAPI } from './api.js'; import { setToken, setUser } from './state.js'; mountHeader(); function onlyDigits(s){return (s||'').replace(/\D/g,'')} const login=document.getElementById('login-form'); const register=document.getElementById('register-form');
+if(login){ login.addEventListener('submit', async e=>{ e.preventDefault(); const email=document.getElementById('email').value.trim(); const password=document.getElementById('password').value.trim(); try{ const res=await AuthAPI.login(email,password); if(res&&res.token){ setToken(res.token); setUser(res.user||{email}); alert('Bem-vindo!'); location.href='index.html'; } else alert('Falha no login.'); }catch(err){ alert(err.message||'Falha no login'); } }); }
+if(register){ register.addEventListener('submit', async e=>{ e.preventDefault(); const name=document.getElementById('rname').value.trim(); const email=document.getElementById('remail').value.trim(); const cpf=onlyDigits(document.getElementById('rcpf').value); const password=document.getElementById('rpassword').value.trim(); const confirm=document.getElementById('rconfirm').value.trim(); if(password!==confirm){ alert('As senhas não conferem.'); return } const payload={ nome:name, email, password, cpf }; try{ const res=await AuthAPI.register(payload); if(res&&(res._id||res.token)){ alert('Conta criada! Faça login.'); location.href='conta.html'; } else alert('Falha no cadastro.'); }catch(err){ alert(err.message||'Erro no cadastro'); } }); }

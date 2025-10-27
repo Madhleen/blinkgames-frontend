@@ -1,5 +1,3 @@
 User-agent: *
 Allow: /
-
 Sitemap: https://blinkgamesrifa.vercel.app/sitemap.xml
-

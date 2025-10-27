@@ -1,14 +1,10 @@
 {
   "name": "blinkgames-frontend",
-  "version": "1.0.0",
-  "description": "Frontend estático da BlinkGames — Rifas de Games e Consoles",
+  "version": "1.1.0",
+  "private": true,
   "scripts": {
     "start": "npx serve .",
     "dev": "npx serve .",
-    "build": "echo 'Static site — no build needed'"
-  },
-  "keywords": ["blinkgames", "rifas", "neon", "frontend"],
-  "author": "BlinkGames Team",
-  "license": "MIT"
+    "build": "echo 'Static site \u2014 no build needed'"
+  }
 }
-
