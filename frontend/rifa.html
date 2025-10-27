@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rifa — BlinkGames</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header id="header"></header>
+  <main class="container">
+    <article id="raffle" class="raffle-detail">
+      <img id="raffle-img" class="raffle-cover" alt="Imagem da rifa" />
+      <div class="raffle-info">
+        <h1 id="raffle-title">Carregando...</h1>
+        <p id="raffle-desc"></p>
+        <p><strong>Preço:</strong> R$ <span id="raffle-price">0,00</span></p>
+        <p><strong>Data do sorteio:</strong> <span id="raffle-date">—</span></p>
+        <div class="qty">
+          <button id="minus">−</button>
+          <input id="qty" type="number" min="1" value="1">
+          <button id="plus">+</button>
+        </div>
+        <div class="actions">
+          <button id="gen" class="btn">Gerar números</button>
+          <button id="add" class="btn btn-primary">Adicionar ao carrinho</button>
+        </div>
+        <div id="numbers" class="numbers"></div>
+      </div>
+    </article>
+  </main>
+  <footer class="footer"><p>© 2025 BlinkGames</p></footer>
+  <script type="module" src="js/app.js"></script>
+  <script type="module" src="js/raffle-detail.js"></script>
+</body>
+</html>
