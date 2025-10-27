@@ -1,0 +1,49 @@
+# === FRONTEND ===
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/.env
+frontend/.DS_Store
+
+# === BACKEND ===
+backend/node_modules/
+backend/.env
+backend/.DS_Store
+backend/coverage/
+backend/logs/
+backend/tmp/
+
+# === SISTEMA ===
+.DS_Store
+Thumbs.db
+*.log
+*.pid
+*.seed
+*.bak
+*.swp
+*.tmp
+.env
+.env.local
+.env.development
+.env.production
+
+# === DEPLOY / BUILD ===
+*.zip
+*.tar.gz
+*.tgz
+*.bak
+*.orig
+*.rej
+*.map
+dist/
+build/
+
+# === IDEs ===
+.vscode/
+.idea/
+*.iml
+
+# === TESTS / COVERAGE ===
+coverage/
+__tests__/
+jest-html-reporters-*.html
