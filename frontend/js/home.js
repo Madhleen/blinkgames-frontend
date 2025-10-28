@@ -1,5 +1,5 @@
 // ============================================================
-// 🎮 BlinkGames — home.js (v5.2 revisado e limpo)
+// 🎮 BlinkGames — home.js (v5.3 com PS5 primeiro nos destaques)
 // ============================================================
 
 import { mountHeader } from './header.js';
@@ -22,7 +22,16 @@ async function load() {
     if (!Array.isArray(cache) || cache.length === 0)
       throw new Error('Sem rifas ativas.');
 
-    grid.innerHTML = cache
+    // 🥇 Garante que PS5 aparece primeiro
+    const ordered = cache.sort((a, b) => {
+      const aTitle = (a.titulo || a.title || '').toLowerCase();
+      const bTitle = (b.titulo || b.title || '').toLowerCase();
+      if (aTitle.includes('ps5')) return -1;
+      if (bTitle.includes('ps5')) return 1;
+      return 0;
+    });
+
+    grid.innerHTML = ordered
       .slice(0, 6)
       .map(
         (r) => `
