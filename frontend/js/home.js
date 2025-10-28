@@ -1,5 +1,5 @@
 // ============================================================
-// 🎮 BlinkGames — home.js (v5.3 com PS5 primeiro nos destaques)
+// 🎮 BlinkGames — home.js (v5.4 aprimorado com PS5 em primeiro)
 // ============================================================
 
 import { mountHeader } from './header.js';
@@ -9,12 +9,11 @@ import { BRL, getCart, saveCart, updateBadge } from './state.js';
 // Monta o cabeçalho
 mountHeader();
 
-// Elemento onde as rifas serão exibidas
 const grid = document.getElementById('featured');
 let cache = [];
 
 // ============================================================
-// 🔄 Carrega rifas do backend (ou mostra fallback)
+// 🔄 Carrega rifas do backend (PS5 primeiro + fallback)
 // ============================================================
 async function load() {
   try {
@@ -22,14 +21,16 @@ async function load() {
     if (!Array.isArray(cache) || cache.length === 0)
       throw new Error('Sem rifas ativas.');
 
-    // 🥇 Garante que PS5 aparece primeiro
-    const ordered = cache.sort((a, b) => {
-      const aTitle = (a.titulo || a.title || '').toLowerCase();
-      const bTitle = (b.titulo || b.title || '').toLowerCase();
-      if (aTitle.includes('ps5')) return -1;
-      if (bTitle.includes('ps5')) return 1;
-      return 0;
-    });
+    // 🥇 Coloca o PS5 no topo, sem alterar o resto da ordem
+    const ps5 = cache.filter(
+      (r) =>
+        (r.titulo || r.title || '').toLowerCase().includes('ps5')
+    );
+    const others = cache.filter(
+      (r) =>
+        !(r.titulo || r.title || '').toLowerCase().includes('ps5')
+    );
+    const ordered = [...ps5, ...others];
 
     grid.innerHTML = ordered
       .slice(0, 6)
@@ -57,7 +58,7 @@ async function load() {
   }
 }
 
-// Chama o carregamento ao iniciar
+// Carrega rifas ao iniciar
 load();
 
 // ============================================================
@@ -73,21 +74,17 @@ grid?.addEventListener('click', async (e) => {
   let expiresAt = null;
 
   try {
-    // Tenta reservar via backend (com TTL de 10 min)
     const res = await RafflesAPI.reserve(id, 1, null);
     numbers = res?.numbers || [];
     reservationId = res?.reservationId || null;
     expiresAt = res?.expiresAt || null;
   } catch {
-    // Fallback local: número aleatório 0000–9999
     numbers = [String(Math.floor(Math.random() * 10000)).padStart(4, '0')];
   }
 
-  // Busca a rifa correspondente
-  const r = (cache || []).find((x) => String(x._id) === String(id));
+  const r = cache.find((x) => String(x._id) === String(id));
   if (!r) return alert('Erro ao encontrar a rifa.');
 
-  // Atualiza o carrinho
   const cart = getCart();
   const existing = cart.find((i) => i._id === id);
 
