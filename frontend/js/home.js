@@ -1,5 +1,5 @@
 // ============================================================
-// 🎮 BlinkGames — home.js (v5.4 aprimorado com PS5 em primeiro)
+// 🎮 BlinkGames — home.js (v5.5 final: PS5 primeiro + adicionar ao carrinho)
 // ============================================================
 
 import { mountHeader } from './header.js';
@@ -21,10 +21,9 @@ async function load() {
     if (!Array.isArray(cache) || cache.length === 0)
       throw new Error('Sem rifas ativas.');
 
-    // 🥇 Coloca o PS5 no topo, sem alterar o resto da ordem
-    const ps5 = cache.filter(
-      (r) =>
-        (r.titulo || r.title || '').toLowerCase().includes('ps5')
+    // 🥇 PS5 primeiro
+    const ps5 = cache.filter((r) =>
+      (r.titulo || r.title || '').toLowerCase().includes('ps5')
     );
     const others = cache.filter(
       (r) =>
@@ -32,6 +31,7 @@ async function load() {
     );
     const ordered = [...ps5, ...others];
 
+    // Monta cards
     grid.innerHTML = ordered
       .slice(0, 6)
       .map(
@@ -44,7 +44,7 @@ async function load() {
             <div class="actions">
               <a class="btn" href="rifa.html?id=${r._id}">Ver detalhes</a>
               <button class="btn btn-primary" data-id="${r._id}">
-                Comprar agora
+                Adicionar ao carrinho
               </button>
             </div>
           </div>
@@ -58,11 +58,11 @@ async function load() {
   }
 }
 
-// Carrega rifas ao iniciar
+// Carrega rifas
 load();
 
 // ============================================================
-// 🛒 Adiciona rifa ao carrinho (gera número automaticamente)
+// 🛒 Adiciona rifa ao carrinho (acumula quantidades)
 // ============================================================
 grid?.addEventListener('click', async (e) => {
   const btn = e.target.closest('button[data-id]');
@@ -74,12 +74,16 @@ grid?.addEventListener('click', async (e) => {
   let expiresAt = null;
 
   try {
-    const res = await RafflesAPI.reserve(id, 1, null);
+    // 🔢 Reserva múltiplos números (3 por vez — pode mudar)
+    const res = await RafflesAPI.reserve(id, 3, null);
     numbers = res?.numbers || [];
     reservationId = res?.reservationId || null;
     expiresAt = res?.expiresAt || null;
   } catch {
-    numbers = [String(Math.floor(Math.random() * 10000)).padStart(4, '0')];
+    // fallback: 3 números aleatórios
+    numbers = Array.from({ length: 3 }, () =>
+      String(Math.floor(Math.random() * 10000)).padStart(4, '0')
+    );
   }
 
   const r = cache.find((x) => String(x._id) === String(id));
@@ -89,7 +93,7 @@ grid?.addEventListener('click', async (e) => {
   const existing = cart.find((i) => i._id === id);
 
   if (existing) {
-    existing.quantity += 1;
+    existing.quantity += numbers.length;
     existing.numbers.push(...numbers);
   } else {
     cart.push({
@@ -97,7 +101,7 @@ grid?.addEventListener('click', async (e) => {
       title: r.titulo || r.title,
       price: r.preco || r.price,
       image: r.imagem || r.image,
-      quantity: 1,
+      quantity: numbers.length,
       numbers,
       reservationId,
       expiresAt,
@@ -108,7 +112,7 @@ grid?.addEventListener('click', async (e) => {
   updateBadge();
 
   alert(
-    `🎟️ Número ${numbers.join(', ')} reservado e adicionado ao carrinho!\nVocê tem 10 minutos para concluir o pagamento.`
+    `🛒 ${numbers.length} número(s) adicionado(s) ao carrinho!\nFinalize sua compra antes que expire a reserva.`
   );
 });
 
