@@ -1,1 +1,5 @@
-document.addEventListener('DOMContentLoaded',()=>{if(!window.Swiper) return; new Swiper('.mySwiper',{loop:true,grabCursor:true,centeredSlides:true,autoplay:{delay:3500,disableOnInteraction:false},slidesPerView:1,spaceBetween:18,pagination:{el:'.swiper-pagination',clickable:true},navigation:{nextEl:'.swiper-button-next',prevEl:'.swiper-button-prev'},breakpoints:{900:{slidesPerView:1.2}}});});
+d// swiper.js — desativado
+// O carrossel foi removido da home.
+// Este arquivo é mantido apenas por compatibilidade futura.
+console.log("Swiper desativado — carrossel removido da BlinkGames.");
+

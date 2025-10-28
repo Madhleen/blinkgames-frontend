@@ -23,12 +23,6 @@
 
     <!-- CSS -->
     <link rel="stylesheet" href="css/style.css" />
-
-    <!-- Swiper -->
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/swiper/swiper-bundle.min.css"
-    />
   </head>
 
   <body>
@@ -43,24 +37,9 @@
       <section class="panel" style="text-align: center">
         <h1>BlinkGames: te leva para a próxima fase!</h1>
         <p>Rifas de games, consoles e periféricos.</p>
-        <a href="rifas.html" class="btn btn-primary" style="margin-top: 12px"
-          >Ver rifas ativas</a
-        >
-      </section>
-
-      <!-- 🎞️ CARROSSEL DESTAQUES -->
-      <section class="panel">
-        <div class="swiper mySwiper">
-          <div class="swiper-wrapper">
-            <div class="swiper-slide"><img src="img/ps5.png" alt="PS5" /></div>
-            <div class="swiper-slide"><img src="img/combo1.png" alt="Combo 1" /></div>
-            <div class="swiper-slide"><img src="img/combo2.png" alt="Combo 2" /></div>
-            <div class="swiper-slide"><img src="img/combo3.png" alt="Combo 3" /></div>
-          </div>
-          <div class="swiper-pagination"></div>
-          <div class="swiper-button-prev"></div>
-          <div class="swiper-button-next"></div>
-        </div>
+        <a href="rifas.html" class="btn btn-primary" style="margin-top: 12px">
+          Ver rifas ativas
+        </a>
       </section>
 
       <!-- 🕹️ RIFAS EM DESTAQUE -->
@@ -77,17 +56,15 @@
       </div>
     </footer>
 
-    <!-- 👾 Pac-Man animado (rodapé discreto) -->
-    <canvas id="pacman-footer"></canvas>
+    <!-- 👾 Pac-Man animado (rodapé discreto e maior) -->
+    <canvas id="pacman-footer" width="100vw" height="80"></canvas>
 
     <!-- ============================================================ -->
     <!-- 🚀 SCRIPTS -->
     <!-- ============================================================ -->
-    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
     <script type="module" src="js/state.js"></script>
     <script type="module" src="js/header.js"></script>
     <script type="module" src="js/api.js"></script>
-    <script type="module" src="js/swiper.js"></script>
     <script type="module" src="js/home.js"></script>
     <script src="js/pacman-bg.js"></script>
   </body>
