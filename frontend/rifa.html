@@ -1,7 +1,59 @@
-<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><link rel="manifest" href="site.webmanifest"/><link rel="icon" type="image/x-icon" href="favicon.ico"/><link rel="stylesheet" href="css/style.css"/><link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css"/><title>BlinkGames — Rifas de Games e Consoles</title></head><body>
-<div id="header"></div>
-<main class="container"><article class="raffle-detail"><img id="raffle-img" class="cover"><div><h1 id="raffle-title">Carregando...</h1><p id="raffle-desc"></p><p><strong>Preço:</strong> R$ <span id="raffle-price">0,00</span></p><p><strong>Data do sorteio:</strong> <span id="raffle-date">—</span></p><div class="qty" style="margin:12px 0"><button class="btn" onclick="document.getElementById('qty').value=Math.max(1,(+document.getElementById('qty').value||1)-1)">-</button><input id="qty" type="number" value="1" min="1"><button class="btn" onclick="document.getElementById('qty').value=(+document.getElementById('qty').value||1)+1">+</button></div><button id="add" class="btn btn-primary">Adicionar ao carrinho</button></div></article></main>
-<footer class="footer"><div class="container"><p>© 2025 BlinkGames</p></div></footer>
-<div id="pacman-wrap"><canvas id="pacman-bg" height="58"></canvas></div>
-<script type="module" src="js/state.js"></script><script type="module" src="js/header.js"></script><script type="module" src="js/api.js"></script><script type="module" src="js/rifa.js"></script><script type="module" src="js/pacman-bg.js"></script>
-</body></html>
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BlinkGames — Rifas de Games e Consoles</title>
+
+    <link rel="manifest" href="site.webmanifest" />
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+
+  <body>
+    <div id="header"></div>
+
+    <main class="container">
+      <article class="raffle-detail">
+        <!-- 🖼️ Imagem maior e centralizada -->
+        <img id="raffle-img" class="cover" style="max-width:600px; width:100%; display:block; margin:0 auto 20px; border-radius:16px;"/>
+
+        <div>
+          <h1 id="raffle-title">Carregando...</h1>
+          <p id="raffle-desc"></p>
+          <p><strong>Preço:</strong> R$ <span id="raffle-price">0,00</span></p>
+          <p><strong>Data do sorteio:</strong> <span id="raffle-date">31/12/2025</span></p>
+
+          <!-- 🔢 Quantidade -->
+          <div class="qty" style="margin:16px 0; display:flex; gap:8px; align-items:center;">
+            <button class="btn" onclick="document.getElementById('qty').value=Math.max(1,(+document.getElementById('qty').value||1)-1)">-</button>
+            <input id="qty" type="number" value="1" min="1" style="width:80px;text-align:center;" />
+            <button class="btn" onclick="document.getElementById('qty').value=(+document.getElementById('qty').value||1)+1">+</button>
+          </div>
+
+          <!-- 🛒 Botão principal -->
+          <button id="add" class="btn btn-primary" style="margin-top:12px;">
+            Adicionar ao carrinho
+          </button>
+        </div>
+      </article>
+    </main>
+
+    <footer class="footer">
+      <div class="container">
+        <p>© 2025 BlinkGames — Todos os direitos reservados.</p>
+      </div>
+    </footer>
+
+    <div id="pacman-wrap">
+      <canvas id="pacman-bg" height="58"></canvas>
+    </div>
+
+    <script type="module" src="js/state.js"></script>
+    <script type="module" src="js/header.js"></script>
+    <script type="module" src="js/api.js"></script>
+    <script type="module" src="js/rifa.js"></script>
+    <script type="module" src="js/pacman-bg.js"></script>
+  </body>
+</html>
+
