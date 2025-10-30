@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Minhas Rifas — BlinkGames</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header id="header"></header>
+
+  <main class="container" style="margin-top: 60px;">
+    <h1>Minhas Rifas</h1>
+    <p style="opacity: 0.7;">Aqui você verá todas as rifas compradas ou reservadas.</p>
+    <ul id="orderList" style="margin-top: 20px;"></ul>
+  </main>
+
+  <footer class="footer">© 2025 BlinkGames</footer>
+
+  <script type="module">
+    import { mountHeader } from "./js/header.js";
+    import { getToken, BRL } from "./js/state.js";
+    import { request } from "./js/api.js";
+
+    mountHeader();
+
+    const orderList = document.getElementById("orderList");
+    const token = getToken();
+
+    if (!token) {
+      orderList.innerHTML = "<p>Você precisa estar logado para ver suas rifas.</p>";
+    } else {
+      loadOrders();
+    }
+
+    async function loadOrders() {
+      try {
+        const res = await fetch("https://blinkgames-backend-p4as.onrender.com/api/order/me", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+
+        if (!data.length) {
+          orderList.innerHTML = "<p>Você ainda não possui rifas.</p>";
+          return;
+        }
+
+        orderList.innerHTML = data
+          .map(
+            (order) => `
+            <li class="panel" style="margin-bottom: 12px;">
+              <strong>Pedido #${order._id.slice(-6)}</strong><br>
+              <small>Status: ${order.status}</small><br>
+              <small>Total: ${BRL(order.total)}</small><br>
+              <ul style="margin-top: 6px;">
+                ${order.itens
+                  .map(
+                    (it) =>
+                      `<li>${it.numeros.length}x — Rifa ${it.raffleId} (${it.numeros.join(", ")})</li>`
+                  )
+                  .join("")}
+              </ul>
+            </li>
+          `
+          )
+          .join("");
+      } catch (err) {
+        console.error("Erro ao carregar rifas:", err);
+        orderList.innerHTML = "<p>Erro ao carregar rifas. Tente novamente.</p>";
+      }
+    }
+  </script>
+</body>
+</html>
+
