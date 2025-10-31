@@ -1,5 +1,5 @@
 // ============================================================
-// 🌐 BlinkGames — api.js (v3.0 revisado e otimizado)
+// 🌐 BlinkGames — api.js (v4.1 — compatível com backend atual)
 // ============================================================
 
 const BASE = "https://blinkgames-backend-p4as.onrender.com";
@@ -10,26 +10,21 @@ const BASE = "https://blinkgames-backend-p4as.onrender.com";
 async function request(path, method = "GET", data = null, token = null) {
   const url = `${BASE}${path.startsWith("/") ? "" : "/"}${path}`;
 
-  // 🔹 Headers base
   const headers = { "Content-Type": "application/json" };
-  if (token) headers["Authorization"] = `Bearer ${token}`; // ✅ JWT no header
+  if (token) headers["Authorization"] = `Bearer ${token}`;
 
-  // 🔹 Configuração da requisição
   const options = { method, headers };
   if (data) options.body = JSON.stringify(data);
 
-  // 🔹 Executa o fetch
   const res = await fetch(url, options);
-
-  // 🔹 Tenta converter resposta em JSON
   let json = null;
+
   try {
     json = await res.json();
   } catch {
-    /* se não for JSON, ignora */
+    // ignora se não for JSON
   }
 
-  // 🔹 Trata erros
   if (!res.ok) {
     const message =
       json?.error ||
@@ -42,10 +37,8 @@ async function request(path, method = "GET", data = null, token = null) {
 }
 
 // ============================================================
-// 🎯 APIs específicas da aplicação
-// ============================================================
-
 // 🎟️ Rifas
+// ============================================================
 export const RafflesAPI = {
   list: () => request("/api/raffles"),
   byId: (id) => request(`/api/raffles/${id}`),
@@ -53,26 +46,34 @@ export const RafflesAPI = {
     request(`/api/raffles/${id}/reserve`, "POST", { qty }, token),
 };
 
+// ============================================================
 // 🏆 Vencedores
+// ============================================================
 export const WinnersAPI = {
   list: () => request("/api/winners").catch(() => []),
 };
 
+// ============================================================
 // 👤 Autenticação
+// ============================================================
 export const AuthAPI = {
   login: (email, password) =>
     request("/api/auth/login", "POST", { email, password }),
   register: (payload) => request("/api/auth/register", "POST", payload),
 };
 
-// 💳 Checkout
+// ============================================================
+// 💳 Checkout (corrigido)
+// ============================================================
+// 🔹 Agora usa o endpoint correto do backend: /api/checkout
+// 🔹 Envia o carrinho no formato certo: { cart: [...] }
 export const CheckoutAPI = {
   create: (cart, token) =>
-    request("/api/order/checkout", "POST", { cart }, token),
+    request("/api/checkout", "POST", { cart }, token),
 };
 
 // ============================================================
-// 🧩 Export default (opcional)
+// ✅ Export default (opcional)
 // ============================================================
 // export default { RafflesAPI, WinnersAPI, AuthAPI, CheckoutAPI };
 
