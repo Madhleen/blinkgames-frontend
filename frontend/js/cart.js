@@ -101,7 +101,6 @@ list.addEventListener("click", (e) => {
     render();
   }
 });
-
 // ============================================================
 // 💳 Finalizar compra
 // ============================================================
@@ -111,6 +110,9 @@ checkoutBtn?.addEventListener("click", async () => {
   // 🔒 Exige login antes de prosseguir
   if (!token) {
     alert("⚠️ Você precisa estar logado para finalizar a compra!");
+    
+    // 🔁 Salva redirecionamento para voltar depois do login
+    localStorage.setItem("redirectAfterLogin", "carrinho.html");
     window.location.href = "login.html";
     return;
   }
