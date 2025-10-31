@@ -1,53 +1,144 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Redefinir Senha — BlinkGames</title>
-  <link rel="icon" type="image/x-icon" href="favicon.ico" />
-  <link rel="stylesheet" href="css/style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Press+Start+2P&display=swap" rel="stylesheet" />
-</head>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Redefinir Senha — BlinkGames</title>
 
-<body>
-  <div id="header"></div>
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Press+Start+2P&display=swap"
+      rel="stylesheet"
+    />
 
-  <main class="container" style="max-width: 420px; margin-top: 60px;">
-    <h1 style="text-align:center; margin-bottom: 24px;">🔐 Nova Senha</h1>
+    <style>
+      main {
+        max-width: 420px;
+        margin: 80px auto;
+        text-align: center;
+      }
 
-    <section class="panel" style="padding: 24px;">
-      <form id="resetForm">
-        <label>Nova senha</label>
-        <input type="password" id="newPassword" placeholder="Digite a nova senha" required />
+      .panel {
+        background: var(--panel);
+        padding: 32px;
+        border-radius: 16px;
+        box-shadow: 0 0 25px rgba(255, 0, 200, 0.15),
+          0 0 50px rgba(0, 224, 255, 0.1);
+      }
 
-        <label>Confirmar nova senha</label>
-        <input type="password" id="confirmPassword" placeholder="Confirme a nova senha" required />
+      h1 {
+        color: var(--accent-2);
+        margin-bottom: 30px;
+      }
 
-        <button class="btn btn-primary" type="submit" style="width: 100%; margin-top: 16px;">
-          Redefinir senha
-        </button>
+      label {
+        display: block;
+        text-align: left;
+        margin-bottom: 6px;
+        color: #ccc;
+        font-size: 0.9rem;
+      }
 
-        <p style="text-align:center; font-size:13px; margin-top: 16px;">
-          Lembrou sua senha?
-          <a href="login.html" style="color: var(--accent-2);">Voltar ao login</a>
-        </p>
-      </form>
-    </section>
-  </main>
+      input {
+        width: 100%;
+        padding: 10px 12px;
+        border-radius: 8px;
+        border: none;
+        background: #1c0135;
+        color: #fff;
+        font-size: 0.95rem;
+        outline: none;
+      }
 
-  <footer class="footer">
-    <div class="container">
-      <p>© 2025 BlinkGames — Todos os direitos reservados.</p>
-    </div>
-  </footer>
+      input:focus {
+        box-shadow: 0 0 0 2px var(--accent);
+      }
 
-  <div id="pacman-wrap"><canvas id="pacman-bg" height="58"></canvas></div>
+      .btn {
+        margin-top: 20px;
+        width: 100%;
+        padding: 10px;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        background: linear-gradient(90deg, var(--accent), var(--accent-2));
+        color: #fff;
+        font-weight: bold;
+        transition: opacity 0.2s ease, transform 0.2s ease;
+      }
 
-  <script type="module" src="js/state.js"></script>
-  <script type="module" src="js/header.js"></script>
-  <script type="module" src="js/api.js"></script>
-  <script type="module" src="js/pacman-bg.js"></script>
-  <script src="js/nova-senha.js"></script>
-</body>
+      .btn:hover {
+        opacity: 0.9;
+        transform: scale(1.02);
+      }
+
+      p {
+        color: #aaa;
+        font-size: 0.9rem;
+        margin-top: 18px;
+      }
+
+      a {
+        color: var(--accent-2);
+        text-decoration: none;
+      }
+
+      a:hover {
+        color: var(--accent);
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="header"></div>
+
+    <main>
+      <h1>🔐 Redefinir Senha</h1>
+
+      <section class="panel">
+        <form id="resetForm">
+          <label for="newPassword">Nova senha</label>
+          <input
+            type="password"
+            id="newPassword"
+            placeholder="Digite a nova senha"
+            required
+          />
+
+          <label for="confirmPassword">Confirmar nova senha</label>
+          <input
+            type="password"
+            id="confirmPassword"
+            placeholder="Confirme a nova senha"
+            required
+          />
+
+          <button class="btn btn-primary" type="submit">
+            Redefinir senha
+          </button>
+
+          <p>
+            🔙 Lembrou sua senha?
+            <a href="conta.html">Voltar para o login</a>
+          </p>
+        </form>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="container">
+        <p>© 2025 BlinkGames — Todos os direitos reservados.</p>
+      </div>
+    </footer>
+
+    <div id="pacman-wrap"><canvas id="pacman-bg" height="58"></canvas></div>
+
+    <script type="module" src="js/state.js"></script>
+    <script type="module" src="js/header.js"></script>
+    <script type="module" src="js/api.js"></script>
+    <script type="module" src="js/pacman-bg.js"></script>
+    <script type="module" src="js/nova-senha.js"></script>
+  </body>
 </html>
 

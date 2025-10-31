@@ -11,6 +11,116 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Press+Start+2P&display=swap"
       rel="stylesheet"
     />
+    <style>
+      main {
+        max-width: 900px;
+        margin: 60px auto;
+        text-align: center;
+      }
+
+      .auth-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 30px;
+        justify-content: center;
+      }
+
+      .panel {
+        background: var(--panel);
+        padding: 32px;
+        border-radius: 16px;
+        box-shadow: 0 0 20px rgba(255, 0, 200, 0.15),
+          0 0 40px rgba(0, 224, 255, 0.1);
+        width: 380px;
+        text-align: left;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .panel:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 0 25px rgba(255, 0, 200, 0.25),
+          0 0 50px rgba(0, 224, 255, 0.15);
+      }
+
+      h1 {
+        margin-bottom: 40px;
+        color: var(--accent-2);
+      }
+
+      h2 {
+        text-align: center;
+        color: var(--accent);
+        font-size: 1.2rem;
+      }
+
+      label {
+        display: block;
+        margin-top: 14px;
+        margin-bottom: 4px;
+        color: #bbb;
+        font-size: 0.9rem;
+      }
+
+      input {
+        width: 100%;
+        padding: 10px 12px;
+        border-radius: 8px;
+        border: none;
+        outline: none;
+        background: #1c0135;
+        color: #fff;
+        font-size: 0.95rem;
+      }
+
+      input:focus {
+        box-shadow: 0 0 0 2px var(--accent);
+      }
+
+      .btn {
+        margin-top: 18px;
+        width: 100%;
+        padding: 10px;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        background: linear-gradient(90deg, var(--accent), var(--accent-2));
+        color: #fff;
+        font-weight: bold;
+        transition: opacity 0.2s ease, transform 0.2s ease;
+      }
+
+      .btn:hover {
+        opacity: 0.9;
+        transform: scale(1.02);
+      }
+
+      .forgot-link {
+        text-align: right;
+        margin-top: 10px;
+      }
+
+      .forgot-link a {
+        color: var(--accent-2);
+        font-size: 0.9rem;
+        text-decoration: none;
+        transition: color 0.2s ease;
+      }
+
+      .forgot-link a:hover {
+        color: var(--accent);
+      }
+
+      @media (max-width: 840px) {
+        .auth-container {
+          flex-direction: column;
+          align-items: center;
+        }
+        .panel {
+          width: 100%;
+          max-width: 420px;
+        }
+      }
+    </style>
   </head>
 
   <body>
@@ -20,54 +130,83 @@
     <!-- ============================================================ -->
     <!-- 🕹️ CONTEÚDO PRINCIPAL -->
     <!-- ============================================================ -->
-    <main class="container" style="max-width: 880px; margin-top: 40px;">
-      <h1 style="text-align:center; margin-bottom: 24px;">🎮 Acesse sua conta</h1>
+    <main>
+      <h1>🎮 Acesse sua conta</h1>
 
-      <div
-        style="
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 28px;
-        "
-      >
+      <div class="auth-container">
         <!-- Login -->
-        <section class="panel" style="text-align: left;">
-          <h2 style="text-align:center;">Entrar</h2>
-          <form id="login-form" style="margin-top: 16px;">
-            <label>Email</label>
-            <input type="email" id="email" placeholder="seuemail@exemplo.com" required />
+        <section class="panel">
+          <h2>Entrar</h2>
+          <form id="login-form">
+            <label for="email">Email</label>
+            <input
+              type="email"
+              id="email"
+              placeholder="seuemail@exemplo.com"
+              required
+            />
 
-            <label>Senha</label>
-            <input type="password" id="password" placeholder="••••••" required />
+            <label for="password">Senha</label>
+            <input
+              type="password"
+              id="password"
+              placeholder="••••••"
+              required
+            />
 
-            <button class="btn btn-primary" type="submit" style="margin-top: 12px; width: 100%;">
-              Entrar
-            </button>
+            <div class="forgot-link">
+              <a href="recuperar.html">Esqueci minha senha</a>
+            </div>
+
+            <button class="btn" type="submit">Entrar</button>
           </form>
         </section>
 
         <!-- Registro -->
-        <section class="panel" style="text-align: left;">
-          <h2 style="text-align:center;">Criar conta</h2>
-          <form id="register-form" style="margin-top: 16px;">
-            <label>Nome completo</label>
-            <input type="text" id="rname" placeholder="Seu nome completo" required />
+        <section class="panel">
+          <h2>Criar conta</h2>
+          <form id="register-form">
+            <label for="rname">Nome completo</label>
+            <input
+              type="text"
+              id="rname"
+              placeholder="Seu nome completo"
+              required
+            />
 
-            <label>Email</label>
-            <input type="email" id="remail" placeholder="seuemail@exemplo.com" required />
+            <label for="remail">Email</label>
+            <input
+              type="email"
+              id="remail"
+              placeholder="seuemail@exemplo.com"
+              required
+            />
 
-            <label>CPF</label>
-            <input type="text" id="rcpf" placeholder="000.000.000-00" required />
+            <label for="rcpf">CPF</label>
+            <input
+              type="text"
+              id="rcpf"
+              placeholder="000.000.000-00"
+              required
+            />
 
-            <label>Senha</label>
-            <input type="password" id="rpassword" placeholder="••••••" required />
+            <label for="rpassword">Senha</label>
+            <input
+              type="password"
+              id="rpassword"
+              placeholder="••••••"
+              required
+            />
 
-            <label>Confirmar senha</label>
-            <input type="password" id="rconfirm" placeholder="Repita sua senha" required />
+            <label for="rconfirm">Confirmar senha</label>
+            <input
+              type="password"
+              id="rconfirm"
+              placeholder="Repita sua senha"
+              required
+            />
 
-            <button class="btn btn-primary" type="submit" style="margin-top: 12px; width: 100%;">
-              Registrar
-            </button>
+            <button class="btn" type="submit">Registrar</button>
           </form>
         </section>
       </div>
