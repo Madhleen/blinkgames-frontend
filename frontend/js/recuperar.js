@@ -15,7 +15,7 @@ form.addEventListener("submit", async (e) => {
   }
 
   try {
-    const res = await fetch("https://blinkgames-backend-p4as.onrender.com/api/auth/forgot", {
+    const res = await fetch("https://blinkgames-backend-p4as.onrender.com/api/auth/forgot-password", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email }),
