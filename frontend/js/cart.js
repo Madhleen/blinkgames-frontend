@@ -1,5 +1,5 @@
 // ============================================================
-// 🛒 BlinkGames — cart.js (v4.2 FINAL — limpa números corretamente)
+// 🛒 BlinkGames — cart.js (v5.0 FINAL — sincroniza números)
 // ============================================================
 
 import { mountHeader } from "./header.js";
@@ -14,15 +14,37 @@ const totalEl = document.getElementById("total");
 const checkoutBtn = document.getElementById("checkout");
 
 // ============================================================
+// 🔢 Gera e sincroniza números do carrinho
+// ============================================================
+function genNumber() {
+  return String(Math.floor(Math.random() * 10000)).padStart(4, "0");
+}
+
+function syncNumbers(item) {
+  if (!Array.isArray(item.numbers)) item.numbers = [];
+
+  const qtd = Number(item.quantity || 0);
+  while (item.numbers.length < qtd) {
+    let n;
+    do n = genNumber(); while (item.numbers.includes(n));
+    item.numbers.push(n);
+  }
+  while (item.numbers.length > qtd) {
+    item.numbers.pop();
+  }
+}
+
+// ============================================================
 // 🔁 Renderiza carrinho
 // ============================================================
 function render() {
   const cart = getCart();
   list.innerHTML = "";
 
-  if (cart.length === 0) {
+  if (!cart || cart.length === 0) {
     empty.style.display = "block";
     totalEl.textContent = BRL(0);
+    updateBadge();
     return;
   }
 
@@ -30,6 +52,8 @@ function render() {
   let total = 0;
 
   cart.forEach((item, idx) => {
+    syncNumbers(item);
+
     const price = Number(item.price || 0);
     const quantity = Number(item.quantity || 0);
     const sub = price * quantity;
@@ -49,9 +73,7 @@ function render() {
             <button class="btn small" data-inc="${idx}">+</button>
           </div>
           <div>${quantity}x — ${BRL(sub)}</div>
-          <small>Números: ${(item.numbers || [])
-            .slice(0, 8)
-            .join(", ")}${(item.numbers || []).length > 8 ? "…" : ""}</small>
+          <small>Números: ${(item.numbers || []).slice(0, 8).join(", ")}${(item.numbers || []).length > 8 ? "…" : ""}</small>
         </div>
 
         <button class="btn" data-remove="${idx}">Remover</button>
@@ -61,11 +83,13 @@ function render() {
     list.appendChild(li);
   });
 
+  saveCart(cart);
+  updateBadge();
   totalEl.textContent = BRL(total);
 }
 
 // ============================================================
-// 🧮 Controle de ações (adicionar, remover, alterar quantidade)
+// 🧮 Ações do carrinho
 // ============================================================
 list.addEventListener("click", (e) => {
   let cart = getCart();
@@ -76,6 +100,7 @@ list.addEventListener("click", (e) => {
   if (inc) {
     const idx = Number(inc.dataset.inc);
     cart[idx].quantity++;
+    syncNumbers(cart[idx]);
     saveCart(cart);
     updateBadge();
     render();
@@ -85,50 +110,23 @@ list.addEventListener("click", (e) => {
     const idx = Number(dec.dataset.dec);
     if (cart[idx].quantity > 1) {
       cart[idx].quantity--;
+      syncNumbers(cart[idx]);
+      saveCart(cart);
     } else {
-      removeItem(idx, cart);
+      cart.splice(idx, 1);
     }
-    saveCart(cart);
     updateBadge();
     render();
   }
 
   if (remove) {
     const idx = Number(remove.dataset.remove);
-    removeItem(idx, cart);
+    cart.splice(idx, 1);
     saveCart(cart);
     updateBadge();
     render();
   }
 });
-
-// ============================================================
-// 🧹 Remove item + limpa números de rifa do localStorage e do carrinho
-// ============================================================
-function removeItem(idx, cart) {
-  const removed = cart[idx];
-  const raffleId = removed._id || removed.raffleId || removed.id;
-
-  // 🔹 Remove o item do carrinho
-  cart.splice(idx, 1);
-
-  // 🔹 Limpa os números associados a essa rifa no localStorage
-  let raffleNumbers = JSON.parse(localStorage.getItem("raffleNumbers")) || {};
-  if (raffleNumbers[raffleId]) {
-    delete raffleNumbers[raffleId];
-    localStorage.setItem("raffleNumbers", JSON.stringify(raffleNumbers));
-    console.log(`🧹 Números da rifa ${raffleId} removidos.`);
-  }
-
-  // 🔹 Atualiza carrinho para remover o campo 'numbers'
-  cart = cart.map((item) => {
-    if (item.raffleId === raffleId || item._id === raffleId || item.id === raffleId) {
-      return { ...item, numbers: [] };
-    }
-    return item;
-  });
-  saveCart(cart);
-}
 
 // ============================================================
 // 💳 Finalizar compra
@@ -153,8 +151,6 @@ checkoutBtn?.addEventListener("click", async () => {
     raffleId: item._id || item.raffleId || item.id,
     qtd: item.quantity || 1,
   }));
-
-  console.log("🧾 Enviando carrinho normalizado:", normalizedCart);
 
   try {
     const result = await CheckoutAPI.create(normalizedCart, token);
