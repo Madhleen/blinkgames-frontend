@@ -1,5 +1,5 @@
 // ============================================================
-// 🛒 BlinkGames — cart.js (v4.0 FINAL)
+// 🛒 BlinkGames — cart.js (v4.1 com correção do bug dos números)
 // ============================================================
 
 import { mountHeader } from "./header.js";
@@ -68,11 +68,12 @@ function render() {
 // 🧮 Controle de ações (adicionar, remover, alterar quantidade)
 // ============================================================
 list.addEventListener("click", (e) => {
-  const cart = getCart();
+  let cart = getCart();
   const inc = e.target.closest("button[data-inc]");
   const dec = e.target.closest("button[data-dec]");
   const remove = e.target.closest("button[data-remove]");
 
+  // Incrementar
   if (inc) {
     const idx = Number(inc.dataset.inc);
     cart[idx].quantity++;
@@ -81,37 +82,56 @@ list.addEventListener("click", (e) => {
     render();
   }
 
+  // Decrementar
   if (dec) {
     const idx = Number(dec.dataset.dec);
     if (cart[idx].quantity > 1) {
       cart[idx].quantity--;
     } else {
-      cart.splice(idx, 1);
+      removeItem(idx, cart);
     }
     saveCart(cart);
     updateBadge();
     render();
   }
 
+  // Remover
   if (remove) {
     const idx = Number(remove.dataset.remove);
-    cart.splice(idx, 1);
+    removeItem(idx, cart);
     saveCart(cart);
     updateBadge();
     render();
   }
 });
+
+// ============================================================
+// 🧹 Função auxiliar — remove item e limpa números da rifa
+// ============================================================
+function removeItem(idx, cart) {
+  const removed = cart[idx];
+  const raffleId = removed._id || removed.raffleId || removed.id;
+
+  // Remove do carrinho
+  cart.splice(idx, 1);
+
+  // Limpa os números da rifa associada
+  let raffleNumbers = JSON.parse(localStorage.getItem("raffleNumbers")) || {};
+  if (raffleNumbers[raffleId]) {
+    delete raffleNumbers[raffleId];
+    localStorage.setItem("raffleNumbers", JSON.stringify(raffleNumbers));
+    console.log(`🧹 Números da rifa ${raffleId} removidos.`);
+  }
+}
+
 // ============================================================
 // 💳 Finalizar compra
 // ============================================================
 checkoutBtn?.addEventListener("click", async () => {
   const token = getToken();
 
-  // 🔒 Exige login antes de prosseguir
   if (!token) {
     alert("⚠️ Você precisa estar logado para finalizar a compra!");
-    
-    // 🔁 Salva redirecionamento para voltar depois do login
     localStorage.setItem("redirectAfterLogin", "carrinho.html");
     window.location.href = "login.html";
     return;
@@ -123,7 +143,6 @@ checkoutBtn?.addEventListener("click", async () => {
     return;
   }
 
-  // 🧩 Normaliza o formato para o backend
   const normalizedCart = cart.map((item) => ({
     raffleId: item._id || item.raffleId || item.id,
     qtd: item.quantity || 1,
@@ -135,7 +154,6 @@ checkoutBtn?.addEventListener("click", async () => {
     const result = await CheckoutAPI.create(normalizedCart, token);
 
     if (result?.init_point) {
-      // ✅ Redireciona para o checkout do Mercado Pago
       window.location.href = result.init_point;
     } else {
       alert("Erro inesperado ao criar checkout.");
@@ -150,4 +168,5 @@ checkoutBtn?.addEventListener("click", async () => {
 // 🚀 Inicializa o carrinho
 // ============================================================
 render();
+
 
