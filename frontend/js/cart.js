@@ -1,5 +1,5 @@
 // ============================================================
-// 🛒 BlinkGames — cart.js (v4.1 com correção do bug dos números)
+// 🛒 BlinkGames — cart.js (v4.2 FINAL — limpa números corretamente)
 // ============================================================
 
 import { mountHeader } from "./header.js";
@@ -73,7 +73,6 @@ list.addEventListener("click", (e) => {
   const dec = e.target.closest("button[data-dec]");
   const remove = e.target.closest("button[data-remove]");
 
-  // Incrementar
   if (inc) {
     const idx = Number(inc.dataset.inc);
     cart[idx].quantity++;
@@ -82,7 +81,6 @@ list.addEventListener("click", (e) => {
     render();
   }
 
-  // Decrementar
   if (dec) {
     const idx = Number(dec.dataset.dec);
     if (cart[idx].quantity > 1) {
@@ -95,7 +93,6 @@ list.addEventListener("click", (e) => {
     render();
   }
 
-  // Remover
   if (remove) {
     const idx = Number(remove.dataset.remove);
     removeItem(idx, cart);
@@ -106,22 +103,31 @@ list.addEventListener("click", (e) => {
 });
 
 // ============================================================
-// 🧹 Função auxiliar — remove item e limpa números da rifa
+// 🧹 Remove item + limpa números de rifa do localStorage e do carrinho
 // ============================================================
 function removeItem(idx, cart) {
   const removed = cart[idx];
   const raffleId = removed._id || removed.raffleId || removed.id;
 
-  // Remove do carrinho
+  // 🔹 Remove o item do carrinho
   cart.splice(idx, 1);
 
-  // Limpa os números da rifa associada
+  // 🔹 Limpa os números associados a essa rifa no localStorage
   let raffleNumbers = JSON.parse(localStorage.getItem("raffleNumbers")) || {};
   if (raffleNumbers[raffleId]) {
     delete raffleNumbers[raffleId];
     localStorage.setItem("raffleNumbers", JSON.stringify(raffleNumbers));
     console.log(`🧹 Números da rifa ${raffleId} removidos.`);
   }
+
+  // 🔹 Atualiza carrinho para remover o campo 'numbers'
+  cart = cart.map((item) => {
+    if (item.raffleId === raffleId || item._id === raffleId || item.id === raffleId) {
+      return { ...item, numbers: [] };
+    }
+    return item;
+  });
+  saveCart(cart);
 }
 
 // ============================================================
@@ -152,7 +158,6 @@ checkoutBtn?.addEventListener("click", async () => {
 
   try {
     const result = await CheckoutAPI.create(normalizedCart, token);
-
     if (result?.init_point) {
       window.location.href = result.init_point;
     } else {
@@ -168,5 +173,4 @@ checkoutBtn?.addEventListener("click", async () => {
 // 🚀 Inicializa o carrinho
 // ============================================================
 render();
-
 
