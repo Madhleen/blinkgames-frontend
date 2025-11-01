@@ -1,5 +1,5 @@
 // ============================================================
-// 👤 BlinkGames — auth.js (v4.0 FINAL)
+// 👤 BlinkGames — auth.js (v4.2 FINAL)
 // ============================================================
 
 import { mountHeader } from "./header.js";
@@ -35,7 +35,6 @@ if (login) {
 
         alert("✅ Login realizado com sucesso!");
 
-        // 🔁 Verifica se há redirecionamento pendente (ex: veio do carrinho)
         const redirect = localStorage.getItem("redirectAfterLogin");
         if (redirect) {
           localStorage.removeItem("redirectAfterLogin");
@@ -44,7 +43,7 @@ if (login) {
           window.location.href = "index.html";
         }
       } else {
-        alert("Falha no login. Verifique suas credenciais.");
+        alert(res.message || "Falha no login. Verifique suas credenciais.");
       }
     } catch (err) {
       alert(err.message || "Erro ao efetuar login.");
@@ -53,7 +52,7 @@ if (login) {
 }
 
 // ============================================================
-// 🧾 REGISTRO
+// 🧾 REGISTRO — Cria conta e faz login automático
 // ============================================================
 const register = document.getElementById("register-form");
 if (register) {
@@ -74,27 +73,30 @@ if (register) {
     const payload = { nome, email, cpf, password };
 
     try {
-      const res = await AuthAPI.register(payload);
+      const res = await fetch("https://blinkgames-backend-p4as.onrender.com/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
 
-      if (res && res.token) {
-        setToken(res.token);
-        setUser(res.user || { nome, email });
+      const data = await res.json();
 
-        alert("🎉 Conta criada com sucesso!");
+      if (!res.ok) throw new Error(data.error || data.message || "Erro ao criar conta.");
 
-        // 🔁 Redireciona se veio do carrinho
-        const redirect = localStorage.getItem("redirectAfterLogin");
-        if (redirect) {
-          localStorage.removeItem("redirectAfterLogin");
-          window.location.href = redirect;
-        } else {
-          window.location.href = "index.html";
-        }
-      } else {
-        alert("Erro ao criar conta. Tente novamente.");
+      // ✅ Conta criada com sucesso
+      alert("🎉 Conta criada com sucesso! Entrando...");
+
+      // 🔐 Login automático
+      if (data.token) {
+        setToken(data.token);
+        setUser(data.user || { nome, email });
       }
+
+      // 🏁 Redireciona
+      window.location.href = "index.html";
     } catch (err) {
-      alert(err.message || "Erro no cadastro.");
+      console.error("❌ Erro no registro:", err);
+      alert(err.message || "Erro ao criar conta.");
     }
   });
 }
