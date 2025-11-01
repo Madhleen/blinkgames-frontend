@@ -1,6 +1,8 @@
 // ============================================================
-// 🔑 BlinkGames — nova-senha.js (v2.0)
+// 🔑 BlinkGames — nova-senha.js (v3.0)
 // ============================================================
+
+const API_URL = "https://blinkgames-backend-p4as.onrender.com";
 
 // 🔹 Lê o token da URL (?token=xyz)
 const urlParams = new URLSearchParams(window.location.search);
@@ -31,15 +33,25 @@ form.addEventListener("submit", async (e) => {
   }
 
   try {
-    const res = await fetch("https://blinkgames-backend-p4as.onrender.com/api/auth/reset", {
+    const response = await fetch(`${API_URL}/api/auth/reset-password`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ token, newPassword }),
     });
 
-    const data = await res.json();
+    // Lê o corpo cru antes de converter
+    const text = await response.text();
+    console.log("Resposta do servidor:", text);
 
-    if (!res.ok) throw new Error(data.error || "Erro ao redefinir senha.");
+    // Tenta converter pra JSON
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch {
+      throw new Error("Resposta inesperada do servidor. Verifique o backend.");
+    }
+
+    if (!response.ok) throw new Error(data.error || "Erro ao redefinir senha.");
 
     alert("✅ Senha redefinida com sucesso!");
     window.location.href = "conta.html";
