@@ -3,20 +3,59 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Termos e Condições — BlinkGames</title>
+  <title>⚡ Termos e Condições — BlinkGames</title>
+
   <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  <link rel="manifest" href="site.webmanifest" />
   <link rel="stylesheet" href="css/style.css" />
+
+  <style>
+    main {
+      margin-top: 60px;
+      line-height: 1.8;
+    }
+
+    h1 {
+      text-align: center;
+      color: var(--accent-2);
+      margin-bottom: 20px;
+    }
+
+    ul li {
+      margin-bottom: 10px;
+    }
+
+    strong {
+      color: var(--accent);
+    }
+
+    .panel {
+      background: var(--panel);
+      padding: 28px;
+      border-radius: 16px;
+      box-shadow: 0 0 25px rgba(255, 0, 200, 0.1), 0 0 50px rgba(0, 224, 255, 0.08);
+    }
+
+    a {
+      color: var(--accent-2);
+      text-decoration: none;
+    }
+
+    a:hover {
+      color: var(--accent);
+    }
+  </style>
 </head>
 
 <body>
   <div id="header"></div>
 
   <main class="container">
-    <section class="panel" style="line-height:1.8;">
+    <section class="panel">
       <h1>⚡ Termos e Condições</h1>
 
-      <p>Bem-vindo(a) à <strong>BlinkGames</strong> — o portal gamer oficial de rifas e sorteios de consoles, jogos e periféricos. 
-      Ao participar de qualquer promoção, você declara estar ciente e de acordo com as condições abaixo.</p>
+      <p>Bem-vindo(a) à <strong>BlinkGames</strong> — o portal gamer oficial de rifas e sorteios de consoles, jogos e periféricos.
+      Ao participar de qualquer promoção, você declara estar ciente e de acordo com as condições abaixo:</p>
 
       <ul style="margin-top: 16px; list-style: none; padding-left: 0;">
         <li>🎮 Todas as rifas são realizadas de forma <strong>transparente e rastreável</strong>, com números únicos e conferência pública.</li>
@@ -30,16 +69,17 @@
       </ul>
 
       <p style="margin-top: 20px;">
-        Ao participar, o usuário declara estar ciente de que a BlinkGames atua como plataforma intermediadora de rifas autorizadas e cumpre todas as diretrizes legais aplicáveis.
+        Ao participar, o usuário declara estar ciente de que a BlinkGames atua como <strong>plataforma intermediadora de rifas auditáveis e seguras</strong>,
+        cumprindo todas as diretrizes legais aplicáveis.
       </p>
 
-      <p style="margin-top: 12px; opacity: 0.85;">
+      <p style="margin-top: 14px; opacity: 0.85;">
         📧 Dúvidas? Fale com nosso suporte: <strong>suporte@blinkgames.com</strong>
       </p>
 
       <p style="margin-top: 20px; font-size: 0.9rem; opacity: 0.75;">
-        © 2025 BlinkGames. Todos os direitos reservados.  
-        CNPJ 00.000.000/0001-00 — Plataforma auditável e segura.  
+        © 2025 BlinkGames. Todos os direitos reservados.<br />
+        CNPJ 00.000.000/0001-00 — Plataforma auditável e segura.<br />
         Certificação baseada nas diretrizes da Caixa Econômica Federal e Ministério da Fazenda.
       </p>
     </section>
@@ -50,6 +90,10 @@
       <p>© 2025 BlinkGames — Todos os direitos reservados.</p>
     </div>
   </footer>
+
+  <div id="pacman-wrap">
+    <canvas id="pacman-footer"></canvas>
+  </div>
 
   <script type="module" src="js/state.js"></script>
   <script type="module" src="js/header.js"></script>

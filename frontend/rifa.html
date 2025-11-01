@@ -1,59 +1,147 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>BlinkGames — Rifas de Games e Consoles</title>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🎟️ Rifa — BlinkGames</title>
 
-    <link rel="manifest" href="site.webmanifest" />
-    <link rel="icon" type="image/x-icon" href="favicon.ico" />
-    <link rel="stylesheet" href="css/style.css" />
-  </head>
+  <link rel="manifest" href="site.webmanifest" />
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  <link rel="stylesheet" href="css/style.css" />
 
-  <body>
-    <div id="header"></div>
+  <style>
+    main {
+      margin-top: 60px;
+    }
 
-    <main class="container">
-      <article class="raffle-detail">
-        <!-- 🖼️ Imagem maior e centralizada -->
-        <img id="raffle-img" class="cover" style="max-width:600px; width:100%; display:block; margin:0 auto 20px; border-radius:16px;"/>
+    .raffle-detail {
+      background: var(--panel);
+      border-radius: 16px;
+      padding: 28px;
+      box-shadow: 0 0 25px rgba(255, 0, 200, 0.1), 0 0 50px rgba(0, 224, 255, 0.08);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
 
-        <div>
-          <h1 id="raffle-title">Carregando...</h1>
-          <p id="raffle-desc"></p>
-          <p><strong>Preço:</strong> R$ <span id="raffle-price">0,00</span></p>
-          <p><strong>Data do sorteio:</strong> <span id="raffle-date">31/12/2025</span></p>
+    .raffle-detail img.cover {
+      width: 100%;
+      max-width: 550px;
+      height: auto;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 0, 200, 0.15);
+      box-shadow: 0 0 30px rgba(255, 0, 200, 0.12);
+      margin-bottom: 20px;
+    }
 
-          <!-- 🔢 Quantidade -->
-          <div class="qty" style="margin:16px 0; display:flex; gap:8px; align-items:center;">
-            <button class="btn" onclick="document.getElementById('qty').value=Math.max(1,(+document.getElementById('qty').value||1)-1)">-</button>
-            <input id="qty" type="number" value="1" min="1" style="width:80px;text-align:center;" />
-            <button class="btn" onclick="document.getElementById('qty').value=(+document.getElementById('qty').value||1)+1">+</button>
-          </div>
+    h1 {
+      color: var(--accent-2);
+      font-size: 1.8rem;
+      margin-bottom: 10px;
+    }
 
-          <!-- 🛒 Botão principal -->
-          <button id="add" class="btn btn-primary" style="margin-top:12px;">
-            Adicionar ao carrinho
-          </button>
+    p {
+      color: #ccc;
+      line-height: 1.6;
+      margin: 6px 0;
+    }
+
+    .qty {
+      margin: 18px 0;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .qty input {
+      width: 80px;
+      text-align: center;
+      background: #1c0135;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      color: #fff;
+      padding: 8px;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 10px;
+      padding: 10px 16px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .btn:hover {
+      opacity: 0.9;
+      transform: scale(1.05);
+    }
+
+    #add {
+      width: 100%;
+      max-width: 250px;
+      margin-top: 14px;
+      font-size: 1rem;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="header"></div>
+
+  <main class="container">
+    <article class="raffle-detail">
+      <img id="raffle-img" class="cover" src="img/icons/placeholder.svg" alt="Rifa" />
+
+      <div>
+        <h1 id="raffle-title">Carregando...</h1>
+        <p id="raffle-desc">Aguarde, estamos carregando as informações da rifa...</p>
+        <p><strong>💰 Preço:</strong> R$ <span id="raffle-price">0,00</span></p>
+        <p><strong>📅 Data do sorteio:</strong> <span id="raffle-date">31/12/2025</span></p>
+
+        <div class="qty">
+          <button class="btn" id="dec">−</button>
+          <input id="qty" type="number" value="1" min="1" />
+          <button class="btn" id="inc">+</button>
         </div>
-      </article>
-    </main>
 
-    <footer class="footer">
-      <div class="container">
-        <p>© 2025 BlinkGames — Todos os direitos reservados.</p>
+        <button id="add" class="btn btn-primary">🛒 Adicionar ao carrinho</button>
       </div>
-    </footer>
+    </article>
+  </main>
 
-    <div id="pacman-wrap">
-      <canvas id="pacman-bg" height="58"></canvas>
+  <footer class="footer">
+    <div class="container">
+      <p>© 2025 BlinkGames — Todos os direitos reservados.</p>
     </div>
+  </footer>
 
-    <script type="module" src="js/state.js"></script>
-    <script type="module" src="js/header.js"></script>
-    <script type="module" src="js/api.js"></script>
-    <script type="module" src="js/rifa.js"></script>
-    <script type="module" src="js/pacman-bg.js"></script>
-  </body>
+  <div id="pacman-wrap">
+    <canvas id="pacman-footer"></canvas>
+  </div>
+
+  <script type="module" src="js/state.js"></script>
+  <script type="module" src="js/header.js"></script>
+  <script type="module" src="js/api.js"></script>
+  <script type="module" src="js/rifa.js"></script>
+  <script type="module" src="js/pacman-bg.js"></script>
+
+  <script>
+    // Incremento e decremento direto (mantém funcionalidade JS inline separada)
+    document.addEventListener("DOMContentLoaded", () => {
+      const qtyInput = document.getElementById("qty");
+      document.getElementById("inc").addEventListener("click", () => {
+        qtyInput.value = Number(qtyInput.value) + 1;
+      });
+      document.getElementById("dec").addEventListener("click", () => {
+        qtyInput.value = Math.max(1, Number(qtyInput.value) - 1);
+      });
+    });
+  </script>
+</body>
 </html>
 

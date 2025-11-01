@@ -3,45 +3,86 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sobre — BlinkGames</title>
+  <title>🚀 Sobre — BlinkGames</title>
+
   <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  <link rel="manifest" href="site.webmanifest" />
   <link rel="stylesheet" href="css/style.css" />
+
+  <style>
+    main {
+      margin-top: 60px;
+      line-height: 1.8;
+      text-align: center;
+    }
+
+    h1 {
+      color: var(--accent-2);
+      margin-bottom: 20px;
+    }
+
+    .panel {
+      background: var(--panel);
+      padding: 32px;
+      border-radius: 16px;
+      box-shadow: 0 0 25px rgba(255, 0, 200, 0.1), 0 0 50px rgba(0, 224, 255, 0.08);
+    }
+
+    strong {
+      color: var(--accent);
+    }
+
+    a {
+      color: var(--accent-2);
+      text-decoration: none;
+    }
+
+    a:hover {
+      color: var(--accent);
+    }
+
+    em {
+      color: var(--accent-3);
+    }
+  </style>
 </head>
 
 <body>
   <div id="header"></div>
 
   <main class="container">
-    <section class="panel" style="text-align:center; line-height:1.8;">
+    <section class="panel">
       <h1>🚀 Sobre a BlinkGames</h1>
 
-      <p style="margin-top: 14px;">
-        A <strong>BlinkGames</strong> nasceu da paixão por <strong>tecnologia, inovação e cultura gamer</strong>. 
-        Somos uma startup brasileira dedicada a criar uma experiência de rifas <strong>100% digital, segura e justa</strong>, 
-        com design inspirado no visual retrô neon dos games clássicos — mas com tecnologia de ponta.
+      <p>
+        A <strong>BlinkGames</strong> nasceu da paixão por <strong>tecnologia, inovação e cultura gamer</strong>.  
+        Somos uma startup brasileira dedicada a oferecer uma experiência de rifas <strong>100% digital, segura e justa</strong>,  
+        com visual <strong>neon retrô</strong> inspirado nos clássicos dos videogames — mas com alma moderna e tecnologia de ponta.
       </p>
 
       <p style="margin-top: 14px;">
-        Nosso propósito é simples: <strong>transformar rifas em experiências</strong>.  
-        Cada número comprado é uma chance real, transparente e divertida.  
-        Aqui, o sorteio não é só sobre ganhar — é sobre jogar limpo, com emoção e credibilidade.
+        Nosso propósito é <strong>transformar rifas em experiências</strong>.  
+        Cada número comprado é mais do que uma aposta — é um momento de emoção real, transparente e cheia de energia gamer.  
+        Aqui, o sorteio é o “game” e você é o protagonista.
       </p>
 
       <p style="margin-top: 14px;">
-        A plataforma utiliza infraestrutura moderna com <strong>servidores em nuvem</strong>, 
-        pagamentos oficiais via <strong>Mercado Pago</strong> e armazenamento seguro de dados.  
-        Tudo isso pra garantir que você participe com confiança e zero dor de cabeça.
+        A plataforma é hospedada em <strong>infraestrutura cloud de alta performance</strong>,  
+        com <strong>pagamentos oficiais via Mercado Pago</strong> e <strong>segurança de dados criptografada</strong>.  
+        Tudo isso pra garantir uma jornada leve, confiável e cheia de estilo.
       </p>
 
       <div style="margin-top: 24px;">
-        <p>🌐 <strong>Plataforma oficial:</strong> <a href="https://blinkgamesrifa.vercel.app" target="_blank">blinkgamesrifa.vercel.app</a></p>
+        <p>🌐 <strong>Plataforma:</strong> <a href="https://blinkgamesrifa.vercel.app" target="_blank">blinkgamesrifa.vercel.app</a></p>
         <p>📧 <strong>Contato:</strong> suporte@blinkgames.com</p>
         <p>🎮 <strong>Fundadora:</strong> <span style="color: var(--accent-2);">Mel</span></p>
       </div>
 
-      <div style="margin-top: 32px; font-size: 0.95rem; opacity: 0.9;">
-        <p>💡 <em>"Blink" representa o instante em que o improvável acontece.  
-        Um piscar de olhos pode mudar o jogo. E é isso que nos move.</em></p>
+      <div style="margin-top: 32px;">
+        <p style="font-size: 0.95rem; opacity: 0.9;">
+          💡 <em>"Blink" representa o instante em que o improvável acontece.  
+          Um piscar de olhos pode mudar o jogo — e é isso que nos move.</em>
+        </p>
       </div>
 
       <div style="margin-top: 28px;">
@@ -55,6 +96,10 @@
       <p>© 2025 BlinkGames — Todos os direitos reservados.</p>
     </div>
   </footer>
+
+  <div id="pacman-wrap">
+    <canvas id="pacman-footer"></canvas>
+  </div>
 
   <script type="module" src="js/state.js"></script>
   <script type="module" src="js/header.js"></script>

@@ -11,6 +11,7 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Press+Start+2P&display=swap"
       rel="stylesheet"
     />
+
     <style>
       main {
         max-width: 900px;
@@ -51,6 +52,7 @@
         text-align: center;
         color: var(--accent);
         font-size: 1.2rem;
+        margin-bottom: 10px;
       }
 
       label {
@@ -86,12 +88,13 @@
         background: linear-gradient(90deg, var(--accent), var(--accent-2));
         color: #fff;
         font-weight: bold;
-        transition: opacity 0.2s ease, transform 0.2s ease;
+        transition: opacity 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
       }
 
       .btn:hover {
         opacity: 0.9;
         transform: scale(1.02);
+        box-shadow: 0 0 10px var(--accent-2);
       }
 
       .forgot-link {
@@ -124,12 +127,8 @@
   </head>
 
   <body>
-    <!-- Cabeçalho -->
     <div id="header"></div>
 
-    <!-- ============================================================ -->
-    <!-- 🕹️ CONTEÚDO PRINCIPAL -->
-    <!-- ============================================================ -->
     <main>
       <h1>🎮 Acesse sua conta</h1>
 
@@ -139,20 +138,10 @@
           <h2>Entrar</h2>
           <form id="login-form">
             <label for="email">Email</label>
-            <input
-              type="email"
-              id="email"
-              placeholder="seuemail@exemplo.com"
-              required
-            />
+            <input type="email" id="email" placeholder="seuemail@exemplo.com" required />
 
             <label for="password">Senha</label>
-            <input
-              type="password"
-              id="password"
-              placeholder="••••••"
-              required
-            />
+            <input type="password" id="password" placeholder="••••••" required />
 
             <div class="forgot-link">
               <a href="recuperar.html">Esqueci minha senha</a>
@@ -167,44 +156,19 @@
           <h2>Criar conta</h2>
           <form id="register-form">
             <label for="rname">Nome completo</label>
-            <input
-              type="text"
-              id="rname"
-              placeholder="Seu nome completo"
-              required
-            />
+            <input type="text" id="rname" placeholder="Seu nome completo" required />
 
             <label for="remail">Email</label>
-            <input
-              type="email"
-              id="remail"
-              placeholder="seuemail@exemplo.com"
-              required
-            />
+            <input type="email" id="remail" placeholder="seuemail@exemplo.com" required />
 
             <label for="rcpf">CPF</label>
-            <input
-              type="text"
-              id="rcpf"
-              placeholder="000.000.000-00"
-              required
-            />
+            <input type="text" id="rcpf" placeholder="000.000.000-00" required />
 
             <label for="rpassword">Senha</label>
-            <input
-              type="password"
-              id="rpassword"
-              placeholder="••••••"
-              required
-            />
+            <input type="password" id="rpassword" placeholder="••••••" required />
 
             <label for="rconfirm">Confirmar senha</label>
-            <input
-              type="password"
-              id="rconfirm"
-              placeholder="Repita sua senha"
-              required
-            />
+            <input type="password" id="rconfirm" placeholder="Repita sua senha" required />
 
             <button class="btn" type="submit">Registrar</button>
           </form>
@@ -212,17 +176,14 @@
       </div>
     </main>
 
-    <!-- Rodapé -->
     <footer class="footer">
       <div class="container">
         <p>© 2025 BlinkGames — Todos os direitos reservados.</p>
       </div>
     </footer>
 
-    <!-- Animação Pac-Man -->
     <div id="pacman-wrap"><canvas id="pacman-bg" height="58"></canvas></div>
 
-    <!-- Scripts -->
     <script type="module" src="js/state.js"></script>
     <script type="module" src="js/header.js"></script>
     <script type="module" src="js/api.js"></script>

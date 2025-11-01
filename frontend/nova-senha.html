@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Redefinir Senha — BlinkGames</title>
+    <title>🔐 Redefinir Senha — BlinkGames</title>
 
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
     <link rel="stylesheet" href="css/style.css" />
@@ -29,7 +29,8 @@
 
       h1 {
         color: var(--accent-2);
-        margin-bottom: 30px;
+        margin-bottom: 24px;
+        font-size: 1.6rem;
       }
 
       label {
@@ -49,6 +50,7 @@
         color: #fff;
         font-size: 0.95rem;
         outline: none;
+        margin-bottom: 12px;
       }
 
       input:focus {
@@ -56,7 +58,7 @@
       }
 
       .btn {
-        margin-top: 20px;
+        margin-top: 12px;
         width: 100%;
         padding: 10px;
         border: none;
@@ -91,8 +93,12 @@
   </head>
 
   <body>
+    <!-- Cabeçalho -->
     <div id="header"></div>
 
+    <!-- ============================================================ -->
+    <!-- 🧩 REDEFINIÇÃO DE SENHA -->
+    <!-- ============================================================ -->
     <main>
       <h1>🔐 Redefinir Senha</h1>
 
@@ -126,14 +132,17 @@
       </section>
     </main>
 
+    <!-- Rodapé -->
     <footer class="footer">
       <div class="container">
         <p>© 2025 BlinkGames — Todos os direitos reservados.</p>
       </div>
     </footer>
 
+    <!-- Pac-Man -->
     <div id="pacman-wrap"><canvas id="pacman-bg" height="58"></canvas></div>
 
+    <!-- Scripts -->
     <script type="module" src="js/state.js"></script>
     <script type="module" src="js/header.js"></script>
     <script type="module" src="js/api.js"></script>
