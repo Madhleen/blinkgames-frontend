@@ -1,5 +1,5 @@
 // ============================================================
-// 🛒 BlinkGames — cart.js (v5.0 FINAL — sincroniza números)
+// 🛒 BlinkGames — cart.js (v5.1 FINAL — compatível com checkout atualizado)
 // ============================================================
 
 import { mountHeader } from "./header.js";
@@ -129,7 +129,7 @@ list.addEventListener("click", (e) => {
 });
 
 // ============================================================
-// 💳 Finalizar compra
+// 💳 Finalizar compra (corrigido para aceitar checkoutUrl e init_point)
 // ============================================================
 checkoutBtn?.addEventListener("click", async () => {
   const token = getToken();
@@ -154,9 +154,14 @@ checkoutBtn?.addEventListener("click", async () => {
 
   try {
     const result = await CheckoutAPI.create(normalizedCart, token);
-    if (result?.init_point) {
+    console.log("💳 Resposta do backend:", result);
+
+    if (result?.checkoutUrl) {
+      window.location.href = result.checkoutUrl;
+    } else if (result?.init_point) {
       window.location.href = result.init_point;
     } else {
+      console.error("❌ Resposta inesperada do backend:", result);
       alert("Erro inesperado ao criar checkout.");
     }
   } catch (err) {
