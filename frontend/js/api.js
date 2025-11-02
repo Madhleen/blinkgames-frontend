@@ -1,5 +1,5 @@
 // ============================================================
-// 🌐 BlinkGames — api.js (v4.1 — compatível com backend atual)
+// 🌐 BlinkGames — api.js (v4.2 FINAL — compatível com backend v6.4)
 // ============================================================
 
 const BASE = "https://blinkgames-backend-p4as.onrender.com";
@@ -63,17 +63,17 @@ export const AuthAPI = {
 };
 
 // ============================================================
-// 💳 Checkout (corrigido)
+// 💳 Checkout (compatível com o backend v6.4)
 // ============================================================
-// 🔹 Agora usa o endpoint correto do backend: /api/checkout
-// 🔹 Envia o carrinho no formato certo: { cart: [...] }
+// ✅ Recebe já o objeto completo { cart: [...] } preparado pelo cart.js
+// ✅ Inclui o token JWT corretamente no header Authorization
 export const CheckoutAPI = {
-  create: (cart, token) =>
-    request("/api/checkout", "POST", { cart }, token),
+  create: (payload, token) =>
+    request("/api/checkout", "POST", payload, token),
 };
 
 // ============================================================
-// ✅ Export default (opcional)
+// ✅ Export default (caso queira importar tudo de uma vez)
 // ============================================================
 // export default { RafflesAPI, WinnersAPI, AuthAPI, CheckoutAPI };
 

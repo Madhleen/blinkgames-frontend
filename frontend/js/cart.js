@@ -1,5 +1,5 @@
 // ============================================================
-// 🛒 BlinkGames — cart.js (v5.1 FINAL — compatível com checkout atualizado)
+// 🛒 BlinkGames — cart.js (v6.0 FINAL — compatível com backend v6.4)
 // ============================================================
 
 import { mountHeader } from "./header.js";
@@ -129,7 +129,7 @@ list.addEventListener("click", (e) => {
 });
 
 // ============================================================
-// 💳 Finalizar compra (corrigido para aceitar checkoutUrl e init_point)
+// 💳 Finalizar compra — envia { cart: [...] } com token JWT
 // ============================================================
 checkoutBtn?.addEventListener("click", async () => {
   const token = getToken();
@@ -147,13 +147,18 @@ checkoutBtn?.addEventListener("click", async () => {
     return;
   }
 
+  // Normaliza dados
   const normalizedCart = cart.map((item) => ({
     raffleId: item._id || item.raffleId || item.id,
-    qtd: item.quantity || 1,
+    title: item.title || "Produto BlinkGames",
+    price: item.price || 1,
+    quantity: item.quantity || 1,
+    numbers: item.numbers || [],
   }));
 
   try {
-    const result = await CheckoutAPI.create(normalizedCart, token);
+    // 👇 Aqui está a correção principal: o corpo precisa ter { cart: [...] }
+    const result = await CheckoutAPI.create({ cart: normalizedCart }, token);
     console.log("💳 Resposta do backend:", result);
 
     if (result?.checkoutUrl) {

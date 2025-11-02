@@ -15,9 +15,9 @@
     <section class="panel">
       <h1>🎟️ Minhas Rifas</h1>
       <p style="opacity: 0.8; margin-bottom: 18px;">
-        Aqui estão todas as rifas que você <strong>comprou ou reservou</strong> na BlinkGames.
+        Aqui estão todas as rifas que você <strong>comprou</strong> na BlinkGames.
       </p>
-      <ul id="orderList" style="margin-top: 20px; list-style: none; padding: 0;"></ul>
+      <ul id="rifaList" style="margin-top: 20px; list-style: none; padding: 0;"></ul>
     </section>
   </main>
 
@@ -35,57 +35,49 @@
   <script type="module">
     import { getToken, BRL } from "./js/state.js";
 
-    const orderList = document.getElementById("orderList");
+    const rifaList = document.getElementById("rifaList");
     const token = getToken();
 
     if (!token) {
-      orderList.innerHTML = `
+      rifaList.innerHTML = `
         <div class="panel" style="text-align:center; opacity:.85;">
           <p>⚠️ Você precisa estar logado para visualizar suas rifas.</p>
           <a href="conta.html" class="btn" style="margin-top:10px;">Fazer login</a>
         </div>
       `;
     } else {
-      loadOrders();
+      loadRifas();
     }
 
-    async function loadOrders() {
+    async function loadRifas() {
       try {
-        const res = await fetch("https://blinkgames-backend-p4as.onrender.com/api/order/me", {
-          headers: { Authorization: `Bearer ${token}` },
+        const res = await fetch("https://blinkgames-backend-p4as.onrender.com/api/auth/me", {
+          headers: { Authorization: \`Bearer \${token}\` },
         });
-        const data = await res.json();
+        const user = await res.json();
 
-        if (!Array.isArray(data) || !data.length) {
-          orderList.innerHTML = `
-            <p style="opacity:.8;">Você ainda não possui rifas ativas.</p>
-          `;
+        if (!user || !Array.isArray(user.purchases) || !user.purchases.length) {
+          rifaList.innerHTML = `<p style="opacity:.8;">Você ainda não possui rifas compradas.</p>`;
           return;
         }
 
-        orderList.innerHTML = data
-          .map(
-            (order) => `
-              <li class="panel" style="margin-bottom: 12px;">
-                <strong>Pedido #${order._id.slice(-6)}</strong><br>
-                <small>Status: <span style="color: var(--accent-2);">${order.status}</span></small><br>
-                <small>Total: <strong>${BRL(order.total)}</strong></small><br>
-                <ul style="margin-top: 8px; list-style:none; padding:0;">
-                  ${order.itens
-                    .map(
-                      (it) =>
-                        `<li style="margin-top:4px;">🎮 ${it.numeros.length}x — Rifa ${it.raffleId} <br>
-                         <small>Números: ${it.numeros.join(", ")}</small></li>`
-                    )
-                    .join("")}
-                </ul>
-              </li>
-            `
-          )
+        rifaList.innerHTML = user.purchases
+          .map((compra) => `
+            <li class="panel" style="margin-bottom: 12px;">
+              <strong>🎮 Rifa: ${compra.raffleId}</strong><br>
+              <small>Pagamento: <span style="color: var(--accent-2);">${compra.paymentId || "—"}</span></small><br>
+              <small>Valor: <strong>${BRL(compra.precoUnit * compra.numeros.length)}</strong></small><br>
+              <small>Data: ${new Date(compra.date).toLocaleDateString("pt-BR")}</small>
+              <p style="margin-top:8px;">
+                <strong>Números:</strong><br>
+                ${compra.numeros.join(", ")}
+              </p>
+            </li>
+          `)
           .join("");
       } catch (err) {
         console.error("❌ Erro ao carregar rifas:", err);
-        orderList.innerHTML = "<p>Erro ao carregar rifas. Tente novamente mais tarde.</p>";
+        rifaList.innerHTML = "<p>Erro ao carregar rifas. Tente novamente mais tarde.</p>";
       }
     }
   </script>
