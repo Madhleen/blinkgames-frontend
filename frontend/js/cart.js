@@ -1,5 +1,5 @@
 // ============================================================
-// 🛒 BlinkGames — cart.js (v6.7 — compatível com backend + webhook)
+// 🛒 BlinkGames — cart.js (v6.8 — corrigido e otimizado)
 // ============================================================
 
 import { mountHeader } from "./header.js";
@@ -7,11 +7,6 @@ import { BRL, getCart, saveCart, updateBadge, getToken } from "./state.js";
 import { CheckoutAPI } from "./api.js";
 
 mountHeader();
-
-const list = document.getElementById("list");
-const empty = document.getElementById("empty");
-const totalEl = document.getElementById("total");
-const checkoutBtn = document.getElementById("checkout");
 
 // ============================================================
 // 🔢 Gera e sincroniza números do carrinho
@@ -23,19 +18,25 @@ function genNumber() {
 function syncNumbers(item) {
   if (!Array.isArray(item.numbers)) item.numbers = [];
   const qtd = Number(item.quantity || 0);
+
   while (item.numbers.length < qtd) {
     let n;
     do n = genNumber(); while (item.numbers.includes(n));
     item.numbers.push(n);
   }
+
   while (item.numbers.length > qtd) item.numbers.pop();
 }
 
 // ============================================================
-// 🔁 Renderiza carrinho
+// 🔁 Renderiza carrinho (versão estável)
 // ============================================================
 function render() {
   const cart = getCart();
+  const list = document.getElementById("list");
+  const empty = document.getElementById("empty");
+  const totalEl = document.getElementById("total");
+
   list.innerHTML = "";
 
   if (!cart || cart.length === 0) {
@@ -50,28 +51,30 @@ function render() {
 
   cart.forEach((item, idx) => {
     syncNumbers(item);
-
     const price = Number(item.price || 0);
     const quantity = Number(item.quantity || 0);
     const sub = price * quantity;
     total += sub;
 
     const li = document.createElement("li");
+    li.className = "panel cart-item";
+    li.dataset.index = idx;
+
     li.innerHTML = `
-      <div class="panel" style="display:flex;gap:14px;align-items:center;margin-bottom:10px">
+      <div style="display:flex;gap:14px;align-items:center;margin-bottom:10px;flex-wrap:wrap">
         <img src="${item.image || "img/icons/placeholder.svg"}"
           style="width:70px;height:70px;object-fit:cover;border-radius:12px;border:1px solid rgba(255,0,200,.22)">
-        <div style="flex:1">
+        <div style="flex:1;min-width:180px">
           <strong>${item.title}</strong>
           <div style="margin:4px 0;">
-            <button class="btn small" data-dec="${idx}">−</button>
+            <button class="btn small" data-action="dec" data-index="${idx}">−</button>
             <span style="margin:0 8px;">${quantity}</span>
-            <button class="btn small" data-inc="${idx}">+</button>
+            <button class="btn small" data-action="inc" data-index="${idx}">+</button>
           </div>
           <div>${quantity}x — ${BRL(sub)}</div>
-          <small>Números: ${(item.numbers || []).join(", ")}</small>
+          <small>Números: ${(item.numbers || []).slice(0, 8).join(", ")}${(item.numbers || []).length > 8 ? "…" : ""}</small>
         </div>
-        <button class="btn" data-remove="${idx}">Remover</button>
+        <button class="btn" data-action="remove" data-index="${idx}">Remover</button>
       </div>
     `;
 
@@ -84,9 +87,36 @@ function render() {
 }
 
 // ============================================================
+// 🧮 Ações do carrinho (delegation fix)
+// ============================================================
+document.addEventListener("click", (e) => {
+  const btn = e.target.closest("button[data-action]");
+  if (!btn) return;
+
+  const idx = Number(btn.dataset.index);
+  const cart = getCart();
+  const action = btn.dataset.action;
+
+  if (isNaN(idx) || !cart[idx]) return;
+
+  if (action === "inc") {
+    cart[idx].quantity++;
+  } else if (action === "dec") {
+    if (cart[idx].quantity > 1) cart[idx].quantity--;
+    else cart.splice(idx, 1);
+  } else if (action === "remove") {
+    cart.splice(idx, 1);
+  }
+
+  saveCart(cart);
+  updateBadge();
+  render();
+});
+
+// ============================================================
 // 💳 Finalizar compra — compatível com backend e webhook
 // ============================================================
-checkoutBtn?.addEventListener("click", async () => {
+document.getElementById("checkout")?.addEventListener("click", async () => {
   const token = getToken();
 
   if (!token) {
