@@ -1,135 +1,5 @@
 // ============================================================
-// 🛒 BlinkGames — cart.js (v6.0 FINAL — compatível com backend v6.4)
-// ============================================================
-
-import { mountHeader } from "./header.js";
-import { BRL, getCart, saveCart, updateBadge, getToken } from "./state.js";
-import { CheckoutAPI } from "./api.js";
-
-mountHeader();
-
-const list = document.getElementById("list");
-const empty = document.getElementById("empty");
-const totalEl = document.getElementById("total");
-const checkoutBtn = document.getElementById("checkout");
-
-// ============================================================
-// 🔢 Gera e sincroniza números do carrinho
-// ============================================================
-function genNumber() {
-  return String(Math.floor(Math.random() * 10000)).padStart(4, "0");
-}
-
-function syncNumbers(item) {
-  if (!Array.isArray(item.numbers)) item.numbers = [];
-
-  const qtd = Number(item.quantity || 0);
-  while (item.numbers.length < qtd) {
-    let n;
-    do n = genNumber(); while (item.numbers.includes(n));
-    item.numbers.push(n);
-  }
-  while (item.numbers.length > qtd) {
-    item.numbers.pop();
-  }
-}
-
-// ============================================================
-// 🔁 Renderiza carrinho
-// ============================================================
-function render() {
-  const cart = getCart();
-  list.innerHTML = "";
-
-  if (!cart || cart.length === 0) {
-    empty.style.display = "block";
-    totalEl.textContent = BRL(0);
-    updateBadge();
-    return;
-  }
-
-  empty.style.display = "none";
-  let total = 0;
-
-  cart.forEach((item, idx) => {
-    syncNumbers(item);
-
-    const price = Number(item.price || 0);
-    const quantity = Number(item.quantity || 0);
-    const sub = price * quantity;
-    total += sub;
-
-    const li = document.createElement("li");
-    li.innerHTML = `
-      <div class="panel" style="display:flex;gap:14px;align-items:center;margin-bottom:10px">
-        <img src="${item.image || "img/icons/placeholder.svg"}"
-          style="width:70px;height:70px;object-fit:cover;border-radius:12px;border:1px solid rgba(255,0,200,.22)">
-        
-        <div style="flex:1">
-          <strong>${item.title}</strong>
-          <div style="margin:4px 0;">
-            <button class="btn small" data-dec="${idx}">−</button>
-            <span style="margin:0 8px;">${quantity}</span>
-            <button class="btn small" data-inc="${idx}">+</button>
-          </div>
-          <div>${quantity}x — ${BRL(sub)}</div>
-          <small>Números: ${(item.numbers || []).slice(0, 8).join(", ")}${(item.numbers || []).length > 8 ? "…" : ""}</small>
-        </div>
-
-        <button class="btn" data-remove="${idx}">Remover</button>
-      </div>
-    `;
-
-    list.appendChild(li);
-  });
-
-  saveCart(cart);
-  updateBadge();
-  totalEl.textContent = BRL(total);
-}
-
-// ============================================================
-// 🧮 Ações do carrinho
-// ============================================================
-list.addEventListener("click", (e) => {
-  let cart = getCart();
-  const inc = e.target.closest("button[data-inc]");
-  const dec = e.target.closest("button[data-dec]");
-  const remove = e.target.closest("button[data-remove]");
-
-  if (inc) {
-    const idx = Number(inc.dataset.inc);
-    cart[idx].quantity++;
-    syncNumbers(cart[idx]);
-    saveCart(cart);
-    updateBadge();
-    render();
-  }
-
-  if (dec) {
-    const idx = Number(dec.dataset.dec);
-    if (cart[idx].quantity > 1) {
-      cart[idx].quantity--;
-      syncNumbers(cart[idx]);
-      saveCart(cart);
-    } else {
-      cart.splice(idx, 1);
-    }
-    updateBadge();
-    render();
-  }
-
-  if (remove) {
-    const idx = Number(remove.dataset.remove);
-    cart.splice(idx, 1);
-    saveCart(cart);
-    updateBadge();
-    render();
-  }
-});
-
-// ============================================================
-// 💳 Finalizar compra — envia { cart: [...] } com token JWT
+// 💳 Finalizar compra — v6.6 compatível com backend e webhook
 // ============================================================
 checkoutBtn?.addEventListener("click", async () => {
   const token = getToken();
@@ -147,17 +17,18 @@ checkoutBtn?.addEventListener("click", async () => {
     return;
   }
 
-  // Normaliza dados
+  // 🔹 Formata o carrinho com os campos esperados no backend e webhook
   const normalizedCart = cart.map((item) => ({
     raffleId: item._id || item.raffleId || item.id,
-    title: item.title || "Produto BlinkGames",
-    price: item.price || 1,
-    quantity: item.quantity || 1,
-    numbers: item.numbers || [],
+    title: item.title || "Rifa BlinkGames",
+    price: Number(item.price) || 1,
+    quantity: Number(item.quantity) || 1,
+    numeros: item.numbers || [],
+    precoUnit: Number(item.price) || 1,
   }));
 
   try {
-    // 👇 Aqui está a correção principal: o corpo precisa ter { cart: [...] }
+    console.log("🧾 Enviando carrinho ao backend:", normalizedCart);
     const result = await CheckoutAPI.create({ cart: normalizedCart }, token);
     console.log("💳 Resposta do backend:", result);
 
@@ -166,17 +37,12 @@ checkoutBtn?.addEventListener("click", async () => {
     } else if (result?.init_point) {
       window.location.href = result.init_point;
     } else {
-      console.error("❌ Resposta inesperada do backend:", result);
       alert("Erro inesperado ao criar checkout.");
+      console.error("❌ Resposta inesperada:", result);
     }
   } catch (err) {
     console.error("❌ Erro no checkout:", err);
     alert(err.message || "Erro ao criar checkout");
   }
 });
-
-// ============================================================
-// 🚀 Inicializa o carrinho
-// ============================================================
-render();
 
