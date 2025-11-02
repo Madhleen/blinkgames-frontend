@@ -137,7 +137,7 @@ checkoutBtn?.addEventListener("click", async () => {
   if (!token) {
     alert("⚠️ Você precisa estar logado para finalizar a compra!");
     localStorage.setItem("redirectAfterLogin", "carrinho.html");
-    window.location.href = "login.html";
+    window.location.href = "conta.html";
     return;
   }
 
