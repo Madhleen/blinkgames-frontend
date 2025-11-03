@@ -1,5 +1,5 @@
 // ============================================================
-// 🛒 BlinkGames — cart.js (v6.8 — corrigido e otimizado)
+// 🛒 BlinkGames — cart.js (v7.0 Estável — fluxo sincronizado com pagamento)
 // ============================================================
 
 import { mountHeader } from "./header.js";
@@ -18,18 +18,16 @@ function genNumber() {
 function syncNumbers(item) {
   if (!Array.isArray(item.numbers)) item.numbers = [];
   const qtd = Number(item.quantity || 0);
-
   while (item.numbers.length < qtd) {
     let n;
     do n = genNumber(); while (item.numbers.includes(n));
     item.numbers.push(n);
   }
-
   while (item.numbers.length > qtd) item.numbers.pop();
 }
 
 // ============================================================
-// 🔁 Renderiza carrinho (versão estável)
+// 🔁 Renderiza carrinho (corrigido e otimizado)
 // ============================================================
 function render() {
   const cart = getCart();
@@ -57,24 +55,22 @@ function render() {
     total += sub;
 
     const li = document.createElement("li");
-    li.className = "panel cart-item";
-    li.dataset.index = idx;
-
+    li.className = "panel";
     li.innerHTML = `
-      <div style="display:flex;gap:14px;align-items:center;margin-bottom:10px;flex-wrap:wrap">
+      <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-bottom:10px;">
         <img src="${item.image || "img/icons/placeholder.svg"}"
           style="width:70px;height:70px;object-fit:cover;border-radius:12px;border:1px solid rgba(255,0,200,.22)">
-        <div style="flex:1;min-width:180px">
+        <div style="flex:1;min-width:180px;">
           <strong>${item.title}</strong>
           <div style="margin:4px 0;">
-            <button class="btn small" data-action="dec" data-index="${idx}">−</button>
+            <button class="btn small dec" data-index="${idx}">−</button>
             <span style="margin:0 8px;">${quantity}</span>
-            <button class="btn small" data-action="inc" data-index="${idx}">+</button>
+            <button class="btn small inc" data-index="${idx}">+</button>
           </div>
           <div>${quantity}x — ${BRL(sub)}</div>
           <small>Números: ${(item.numbers || []).slice(0, 8).join(", ")}${(item.numbers || []).length > 8 ? "…" : ""}</small>
         </div>
-        <button class="btn" data-action="remove" data-index="${idx}">Remover</button>
+        <button class="btn remove" data-index="${idx}">Remover</button>
       </div>
     `;
 
@@ -84,37 +80,48 @@ function render() {
   saveCart(cart);
   updateBadge();
   totalEl.textContent = BRL(total);
+
+  attachEvents();
 }
 
 // ============================================================
-// 🧮 Ações do carrinho (delegation fix)
+// 🧮 Eventos locais corrigidos
 // ============================================================
-document.addEventListener("click", (e) => {
-  const btn = e.target.closest("button[data-action]");
-  if (!btn) return;
+function attachEvents() {
+  document.querySelectorAll(".inc").forEach((btn) =>
+    btn.addEventListener("click", () => {
+      const idx = Number(btn.dataset.index);
+      const cart = getCart();
+      cart[idx].quantity++;
+      saveCart(cart);
+      render();
+    })
+  );
 
-  const idx = Number(btn.dataset.index);
-  const cart = getCart();
-  const action = btn.dataset.action;
+  document.querySelectorAll(".dec").forEach((btn) =>
+    btn.addEventListener("click", () => {
+      const idx = Number(btn.dataset.index);
+      const cart = getCart();
+      if (cart[idx].quantity > 1) cart[idx].quantity--;
+      else cart.splice(idx, 1);
+      saveCart(cart);
+      render();
+    })
+  );
 
-  if (isNaN(idx) || !cart[idx]) return;
-
-  if (action === "inc") {
-    cart[idx].quantity++;
-  } else if (action === "dec") {
-    if (cart[idx].quantity > 1) cart[idx].quantity--;
-    else cart.splice(idx, 1);
-  } else if (action === "remove") {
-    cart.splice(idx, 1);
-  }
-
-  saveCart(cart);
-  updateBadge();
-  render();
-});
+  document.querySelectorAll(".remove").forEach((btn) =>
+    btn.addEventListener("click", () => {
+      const idx = Number(btn.dataset.index);
+      const cart = getCart();
+      cart.splice(idx, 1);
+      saveCart(cart);
+      render();
+    })
+  );
+}
 
 // ============================================================
-// 💳 Finalizar compra — compatível com backend e webhook
+// 💳 Finalizar compra
 // ============================================================
 document.getElementById("checkout")?.addEventListener("click", async () => {
   const token = getToken();
@@ -142,14 +149,16 @@ document.getElementById("checkout")?.addEventListener("click", async () => {
   }));
 
   try {
-    console.log("🧾 Enviando carrinho ao backend:", normalizedCart);
+    console.log("🧾 Enviando carrinho:", normalizedCart);
     const result = await CheckoutAPI.create({ cart: normalizedCart }, token);
-    console.log("💳 Resposta do backend:", result);
+    console.log("💳 Resposta:", result);
 
     if (result?.checkoutUrl) {
+      // 💥 Salva backup temporário para evitar inconsistência
+      localStorage.setItem("checkoutCache", JSON.stringify(cart));
       window.location.href = result.checkoutUrl;
     } else {
-      alert("Erro inesperado ao criar checkout.");
+      alert("Erro ao criar checkout.");
     }
   } catch (err) {
     console.error("❌ Erro no checkout:", err);
@@ -158,7 +167,7 @@ document.getElementById("checkout")?.addEventListener("click", async () => {
 });
 
 // ============================================================
-// 🚀 Inicializa o carrinho
+// 🚀 Inicializa
 // ============================================================
 render();
 
