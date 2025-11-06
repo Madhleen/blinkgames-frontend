@@ -1,5 +1,5 @@
 // ============================================================
-// 🌐 BlinkGames — api.js (v4.2 FINAL — compatível com backend v6.4)
+// 🌐 BlinkGames — api.js (v4.3 PRODUÇÃO — alinhado com backend v7.2)
 // ============================================================
 
 const BASE = "https://blinkgames-backend-p4as.onrender.com";
@@ -63,13 +63,18 @@ export const AuthAPI = {
 };
 
 // ============================================================
-// 💳 Checkout (compatível com o backend v6.4)
+// 💳 Checkout (vinculado ao usuário logado)
 // ============================================================
-// ✅ Recebe já o objeto completo { cart: [...] } preparado pelo cart.js
-// ✅ Inclui o token JWT corretamente no header Authorization
+// ✅ Envia o JWT do usuário ativo via header Authorization
+// ✅ Evita fallback para “guest” no backend
+// ✅ Payload: { cart: [...] }
 export const CheckoutAPI = {
-  create: (payload, token) =>
-    request("/api/checkout", "POST", payload, token),
+  create: async (payload, token) => {
+    if (!token) {
+      throw new Error("Usuário não autenticado. Faça login para prosseguir.");
+    }
+    return await request("/api/checkout", "POST", payload, token);
+  },
 };
 
 // ============================================================
