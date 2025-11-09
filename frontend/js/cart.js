@@ -1,5 +1,5 @@
 // ============================================================
-// 🛒 BlinkGames — cart.js (v9.2 Produção Estável — Reserva + JWT Fix)
+// 🛒 BlinkGames — cart.js (v9.3 Produção Final — Render + Reserva + JWT)
 // ============================================================
 
 import { mountHeader } from "./header.js";
@@ -43,6 +43,66 @@ async function ensureReservation(item, token) {
 }
 
 // ============================================================
+// 🧾 Renderiza o conteúdo do carrinho
+// ============================================================
+function renderCart() {
+  const list = document.getElementById("list");
+  const empty = document.getElementById("empty");
+  const totalEl = document.getElementById("total");
+
+  const cart = getCart();
+
+  if (!cart.length) {
+    list.innerHTML = "";
+    empty.style.display = "block";
+    totalEl.textContent = "R$ 0,00";
+    return;
+  }
+
+  empty.style.display = "none";
+
+  list.innerHTML = cart
+    .map(
+      (item, i) => `
+    <li class="panel" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+      <div>
+        <strong>${item.title}</strong><br>
+        <small>${item.numbers?.join(", ") || "Números reservados"}</small><br>
+        <small>Qtd: ${item.quantity}</small>
+      </div>
+      <div>
+        <strong>${BRL(item.price * item.quantity)}</strong><br>
+        <button class="btn small" data-remove="${i}">🗑️ Remover</button>
+      </div>
+    </li>
+  `
+    )
+    .join("");
+
+  // Remove item do carrinho
+  list.querySelectorAll("[data-remove]").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      const idx = parseInt(e.target.dataset.remove);
+      const updated = getCart().filter((_, i) => i !== idx);
+      saveCart(updated);
+      renderCart();
+    });
+  });
+
+  const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  totalEl.textContent = BRL(total);
+}
+
+// ============================================================
+// 🧹 Limpar o carrinho inteiro
+// ============================================================
+function clearCart() {
+  localStorage.removeItem("blink_cart");
+  updateBadge();
+  renderCart();
+}
+
+// ============================================================
 // 🛍️ Finalizar compra
 // ============================================================
 document.getElementById("checkout")?.addEventListener("click", async () => {
@@ -65,16 +125,13 @@ document.getElementById("checkout")?.addEventListener("click", async () => {
   }
 
   try {
-    // Reserva item a item
     for (const item of cart) {
       await ensureReservation(item, token);
     }
 
-    // Atualiza storage e badge
     saveCart(cart);
     updateBadge();
 
-    // Monta payload para checkout
     const normalizedCart = cart.map((item) => ({
       raffleId: item._id || item.raffleId || item.id,
       title: item.title || "Rifa BlinkGames",
@@ -99,12 +156,23 @@ document.getElementById("checkout")?.addEventListener("click", async () => {
     const msg = String(err?.message || "").toLowerCase();
     if (msg.includes("unauthorized") || msg.includes("token")) {
       alert("Sessão expirada. Faça login novamente.");
-      localStorage.clear(); // 🧹 limpa tudo pra evitar token travado
+      localStorage.clear();
       window.location.href = "conta.html";
       return;
     }
 
     alert(err.message || "Erro ao reservar/criar checkout.");
   }
+});
+
+// ============================================================
+// 🚀 Render inicial
+// ============================================================
+document.addEventListener("DOMContentLoaded", () => {
+  renderCart();
+
+  // Botão limpar carrinho (se existir)
+  const clearBtn = document.getElementById("clear-cart");
+  if (clearBtn) clearBtn.addEventListener("click", clearCart);
 });
 

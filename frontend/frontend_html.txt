@@ -1,0 +1,1494 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Pagamento Pendente — BlinkGames</title>
+  <style>
+    body { background:#0a0015; color:white; font-family:Inter,sans-serif; text-align:center; padding-top:80px; }
+    h1 { color:#ffde59; }
+  </style>
+</head>
+<body>
+  <h1>⏳ Pagamento pendente</h1>
+  <p>Assim que for confirmado, sua rifa será liberada.</p>
+  <a href="index.html">Voltar à loja</a>
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🛒 Carrinho — BlinkGames</title>
+
+    <link rel="manifest" href="site.webmanifest" />
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/swiper/swiper-bundle.min.css"
+    />
+
+    <style>
+      h1 {
+        color: var(--accent-2);
+        margin-bottom: 20px;
+      }
+
+      #list .panel {
+        background: var(--panel);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      #list .panel:hover {
+        transform: scale(1.01);
+        box-shadow: 0 0 20px rgba(255, 0, 200, 0.2),
+          0 0 40px rgba(0, 224, 255, 0.1);
+      }
+
+      #checkout {
+        background: linear-gradient(90deg, var(--accent), var(--accent-2));
+        font-weight: bold;
+      }
+
+      #checkout:hover {
+        opacity: 0.9;
+        transform: scale(1.03);
+      }
+
+      @media (max-width: 640px) {
+        main.container {
+          padding: 0 10px;
+        }
+        .panel {
+          flex-direction: column;
+          text-align: center;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Cabeçalho -->
+    <div id="header"></div>
+
+    <!-- ============================================================ -->
+    <!-- 🛒 CONTEÚDO PRINCIPAL -->
+    <!-- ============================================================ -->
+    <main class="container">
+      <h1>🛍️ Seu carrinho</h1>
+
+      <!-- Vazio -->
+      <div id="empty" class="panel" style="text-align:center; opacity: 0.8;">
+        Carrinho vazio.<br />
+        <a href="rifas.html" class="btn btn-primary" style="margin-top:10px;">Ver rifas disponíveis</a>
+      </div>
+
+      <!-- Lista -->
+      <ul id="list" style="list-style:none;padding:0;margin:0"></ul>
+
+      <!-- Total -->
+      <div
+        class="panel"
+        style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;"
+      >
+        <strong>Total: <span id="total">R$ 0,00</span></strong>
+        <button id="checkout" class="btn btn-primary">Finalizar compra</button>
+      </div>
+    </main>
+
+    <!-- ============================================================ -->
+    <!-- ⚡ RODAPÉ -->
+    <!-- ============================================================ -->
+    <footer class="footer">
+      <div class="container">
+        <p>© 2025 BlinkGames — Todos os direitos reservados.</p>
+      </div>
+    </footer>
+
+    <!-- 👾 PAC-MAN -->
+    <div id="pacman-wrap"><canvas id="pacman-bg" height="58"></canvas></div>
+
+    <!-- ============================================================ -->
+    <!-- 🚀 SCRIPTS (na ordem certa) -->
+    <!-- ============================================================ -->
+    <script type="module" src="js/state.js"></script>
+    <script type="module" src="js/header.js"></script>
+    <script type="module" src="js/api.js"></script>
+
+    <!-- 🔥 Carrinho deve carregar depois de tudo -->
+    <script type="module">
+      import "./js/cart.js";
+    </script>
+
+    <script type="module" src="js/pacman-bg.js"></script>
+  </body>
+</html>
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Minha Conta — BlinkGames</title>
+
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Press+Start+2P&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      main {
+        max-width: 900px;
+        margin: 60px auto;
+        text-align: center;
+      }
+
+      .auth-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 30px;
+        justify-content: center;
+      }
+
+      .panel {
+        background: var(--panel);
+        padding: 32px;
+        border-radius: 16px;
+        box-shadow: 0 0 20px rgba(255, 0, 200, 0.15),
+          0 0 40px rgba(0, 224, 255, 0.1);
+        width: 380px;
+        text-align: left;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .panel:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 0 25px rgba(255, 0, 200, 0.25),
+          0 0 50px rgba(0, 224, 255, 0.15);
+      }
+
+      h1 {
+        margin-bottom: 40px;
+        color: var(--accent-2);
+      }
+
+      h2 {
+        text-align: center;
+        color: var(--accent);
+        font-size: 1.2rem;
+        margin-bottom: 10px;
+      }
+
+      label {
+        display: block;
+        margin-top: 14px;
+        margin-bottom: 4px;
+        color: #bbb;
+        font-size: 0.9rem;
+      }
+
+      input {
+        width: 100%;
+        padding: 10px 12px;
+        border-radius: 8px;
+        border: none;
+        outline: none;
+        background: #1c0135;
+        color: #fff;
+        font-size: 0.95rem;
+      }
+
+      input:focus {
+        box-shadow: 0 0 0 2px var(--accent);
+      }
+
+      .btn {
+        margin-top: 18px;
+        width: 100%;
+        padding: 10px;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        background: linear-gradient(90deg, var(--accent), var(--accent-2));
+        color: #fff;
+        font-weight: bold;
+        transition: opacity 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .btn:hover {
+        opacity: 0.9;
+        transform: scale(1.02);
+        box-shadow: 0 0 10px var(--accent-2);
+      }
+
+      .forgot-link {
+        text-align: right;
+        margin-top: 10px;
+      }
+
+      .forgot-link a {
+        color: var(--accent-2);
+        font-size: 0.9rem;
+        text-decoration: none;
+        transition: color 0.2s ease;
+      }
+
+      .forgot-link a:hover {
+        color: var(--accent);
+      }
+
+      @media (max-width: 840px) {
+        .auth-container {
+          flex-direction: column;
+          align-items: center;
+        }
+        .panel {
+          width: 100%;
+          max-width: 420px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="header"></div>
+
+    <main>
+      <h1>🎮 Acesse sua conta</h1>
+
+      <div class="auth-container">
+        <!-- Login -->
+        <section class="panel">
+          <h2>Entrar</h2>
+          <form id="login-form">
+            <label for="email">Email</label>
+            <input type="email" id="email" placeholder="seuemail@exemplo.com" required />
+
+            <label for="password">Senha</label>
+            <input type="password" id="password" placeholder="••••••" required />
+
+            <div class="forgot-link">
+              <a href="recuperar.html">Esqueci minha senha</a>
+            </div>
+
+            <button class="btn" type="submit">Entrar</button>
+          </form>
+        </section>
+
+        <!-- Registro -->
+        <section class="panel">
+          <h2>Criar conta</h2>
+          <form id="register-form">
+            <label for="rname">Nome completo</label>
+            <input type="text" id="rname" placeholder="Seu nome completo" required />
+
+            <label for="remail">Email</label>
+            <input type="email" id="remail" placeholder="seuemail@exemplo.com" required />
+
+            <label for="rcpf">CPF</label>
+            <input type="text" id="rcpf" placeholder="000.000.000-00" required />
+
+            <label for="rpassword">Senha</label>
+            <input type="password" id="rpassword" placeholder="••••••" required />
+
+            <label for="rconfirm">Confirmar senha</label>
+            <input type="password" id="rconfirm" placeholder="Repita sua senha" required />
+
+            <button class="btn" type="submit">Registrar</button>
+          </form>
+        </section>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="container">
+        <p>© 2025 BlinkGames — Todos os direitos reservados.</p>
+      </div>
+    </footer>
+
+    <div id="pacman-wrap"><canvas id="pacman-bg" height="58"></canvas></div>
+
+    <!-- 🚀 Scripts na ordem correta -->
+    <script type="module" src="js/state.js"></script>
+    <script type="module" src="js/header.js"></script>
+    <script type="module" src="js/api.js"></script>
+    <script type="module" src="js/pacman-bg.js"></script>
+    <script type="module" src="js/auth.js"></script> <!-- 🔹 AGORA POR ÚLTIMO -->
+  </body>
+</html>
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Erro no Pagamento — BlinkGames</title>
+  <style>
+    body { background:#0a0015; color:white; font-family:Inter,sans-serif; text-align:center; padding-top:80px; }
+    h1 { color:#ff00c8; }
+  </style>
+</head>
+<body>
+  <h1>❌ Falha no pagamento</h1>
+  <p>Ocorreu um erro durante o processo. Tente novamente.</p>
+  <a href="carrinho.html">Voltar ao carrinho</a>
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="BlinkGames — Rifas de games, consoles e periféricos com visual neon estilo GTA."
+    />
+    <meta name="theme-color" content="#0a0015" />
+    <title>BlinkGames — Rifas de Games e Consoles</title>
+
+    <!-- Ícones e manifest -->
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="img/icons/icon-192.png" />
+    <link rel="manifest" href="site.webmanifest" />
+
+    <!-- Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Press+Start+2P&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+
+  <body>
+    <!-- Cabeçalho dinâmico -->
+    <div id="header"></div>
+
+    <!-- ============================================================ -->
+    <!-- 🎮 CONTEÚDO PRINCIPAL -->
+    <!-- ============================================================ -->
+    <main class="container">
+      <!-- HERO -->
+      <section class="panel" style="text-align: center;">
+        <h1>🚀 BlinkGames te leva para a próxima fase!</h1>
+        <p style="opacity: 0.9; margin-top: 6px;">
+          Rifas oficiais de <strong>games, consoles e periféricos</strong> com transparência e visual gamer neon.
+        </p>
+        <a href="rifas.html" class="btn btn-primary" style="margin-top: 16px;">
+          🎟️ Ver rifas ativas
+        </a>
+      </section>
+
+      <!-- 🕹️ RIFAS EM DESTAQUE -->
+      <section class="panel">
+        <h2>🔥 Rifas em destaque</h2>
+        <div id="featured" class="grid"></div>
+      </section>
+    </main>
+
+    <!-- ⚡ Rodapé -->
+    <footer class="footer">
+      <div class="container">
+        <p>© 2025 BlinkGames — Todos os direitos reservados.</p>
+      </div>
+    </footer>
+
+    <!-- 👾 Pac-Man animado (rodapé) -->
+    <div id="pacman-wrap">
+      <canvas id="pacman-bg" height="58"></canvas>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- 🚀 SCRIPTS -->
+    <!-- ============================================================ -->
+    <script type="module" src="js/state.js"></script>
+    <script type="module" src="js/header.js"></script>
+    <script type="module" src="js/api.js"></script>
+    <script type="module" src="js/home.js"></script>
+    <script type="module" src="js/pacman-bg.js"></script>
+  </body>
+</html>
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Minhas Rifas — BlinkGames</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+
+  <body>
+    <div id="header"></div>
+
+    <main class="container" style="margin-top: 60px;">
+      <section class="panel">
+        <h1>🎟️ Minhas Rifas</h1>
+        <p style="opacity: 0.8; margin-bottom: 18px;">
+          Aqui estão todas as rifas que você <strong>comprou</strong> na BlinkGames.
+        </p>
+        <ul id="rifaList" style="margin-top: 20px; list-style: none; padding: 0;"></ul>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="container">
+        <p>© 2025 BlinkGames — Todos os direitos reservados.</p>
+      </div>
+    </footer>
+
+    <!-- Scripts base -->
+    <script type="module" src="js/state.js"></script>
+    <script type="module" src="js/header.js"></script>
+    <script type="module" src="js/api.js"></script>
+    <script type="module" src="js/pacman-bg.js"></script>
+
+    <!-- Script principal da página -->
+    <script type="module">
+      import { getToken, BRL } from "./js/state.js";
+      import { mountHeader } from "./js/header.js";
+
+      document.addEventListener("DOMContentLoaded", async () => {
+        mountHeader();
+
+        const rifaList = document.getElementById("rifaList");
+        const token = getToken();
+
+        if (!token) {
+          rifaList.innerHTML = `
+            <div class="panel" style="text-align:center; opacity:.85;">
+              <p>⚠️ Você precisa estar logado para visualizar suas rifas.</p>
+              <a href="conta.html" class="btn" style="margin-top:10px;">Fazer login</a>
+            </div>
+          `;
+          return;
+        }
+
+        try {
+          const res = await fetch("https://blinkgames-backend-p4as.onrender.com/api/auth/me", {
+            headers: { Authorization: \`Bearer \${token}\` },
+          });
+
+          if (!res.ok) throw new Error("Erro ao buscar dados do usuário.");
+
+          const user = await res.json();
+          console.log("📦 Dados do usuário:", user);
+
+          if (!user || !Array.isArray(user.purchases) || user.purchases.length === 0) {
+            rifaList.innerHTML = `<p style="opacity:.8;">Você ainda não possui rifas compradas.</p>`;
+            return;
+          }
+
+          rifaList.innerHTML = user.purchases
+            .map(
+              (compra) => `
+              <li class="panel" style="margin-bottom: 12px;">
+                <strong>🎮 Rifa:</strong> ${compra.raffleId}<br>
+                <small>Pagamento: <span style="color: var(--accent-2);">${
+                  compra.paymentId || "—"
+                }</span></small><br>
+                <small>Valor: <strong>${BRL(
+                  compra.precoUnit * compra.numeros.length
+                )}</strong></small><br>
+                <small>Data: ${new Date(compra.date).toLocaleDateString("pt-BR")}</small>
+                <p style="margin-top:8px;">
+                  <strong>Números:</strong><br>
+                  ${compra.numeros.join(", ")}
+                </p>
+              </li>
+            `
+            )
+            .join("");
+        } catch (err) {
+          console.error("❌ Erro ao carregar rifas:", err);
+          rifaList.innerHTML =
+            "<p>❌ Erro ao carregar rifas. Tente novamente mais tarde.</p>";
+        }
+      });
+    </script>
+  </body>
+</html>
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🔐 Redefinir Senha — BlinkGames</title>
+
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Press+Start+2P&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      main {
+        max-width: 420px;
+        margin: 80px auto;
+        text-align: center;
+      }
+
+      .panel {
+        background: var(--panel);
+        padding: 32px;
+        border-radius: 16px;
+        box-shadow: 0 0 25px rgba(255, 0, 200, 0.15),
+          0 0 50px rgba(0, 224, 255, 0.1);
+      }
+
+      h1 {
+        color: var(--accent-2);
+        margin-bottom: 24px;
+        font-size: 1.6rem;
+      }
+
+      label {
+        display: block;
+        text-align: left;
+        margin-bottom: 6px;
+        color: #ccc;
+        font-size: 0.9rem;
+      }
+
+      input {
+        width: 100%;
+        padding: 10px 12px;
+        border-radius: 8px;
+        border: none;
+        background: #1c0135;
+        color: #fff;
+        font-size: 0.95rem;
+        outline: none;
+        margin-bottom: 12px;
+      }
+
+      input:focus {
+        box-shadow: 0 0 0 2px var(--accent);
+      }
+
+      .btn {
+        margin-top: 12px;
+        width: 100%;
+        padding: 10px;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        background: linear-gradient(90deg, var(--accent), var(--accent-2));
+        color: #fff;
+        font-weight: bold;
+        transition: opacity 0.2s ease, transform 0.2s ease;
+      }
+
+      .btn:hover {
+        opacity: 0.9;
+        transform: scale(1.02);
+      }
+
+      p {
+        color: #aaa;
+        font-size: 0.9rem;
+        margin-top: 18px;
+      }
+
+      a {
+        color: var(--accent-2);
+        text-decoration: none;
+      }
+
+      a:hover {
+        color: var(--accent);
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Cabeçalho -->
+    <div id="header"></div>
+
+    <!-- ============================================================ -->
+    <!-- 🧩 REDEFINIÇÃO DE SENHA -->
+    <!-- ============================================================ -->
+    <main>
+      <h1>🔐 Redefinir Senha</h1>
+
+      <section class="panel">
+        <form id="resetForm">
+          <label for="newPassword">Nova senha</label>
+          <input
+            type="password"
+            id="newPassword"
+            placeholder="Digite a nova senha"
+            required
+          />
+
+          <label for="confirmPassword">Confirmar nova senha</label>
+          <input
+            type="password"
+            id="confirmPassword"
+            placeholder="Confirme a nova senha"
+            required
+          />
+
+          <button class="btn btn-primary" type="submit">
+            Redefinir senha
+          </button>
+
+          <p>
+            🔙 Lembrou sua senha?
+            <a href="conta.html">Voltar para o login</a>
+          </p>
+        </form>
+      </section>
+    </main>
+
+    <!-- Rodapé -->
+    <footer class="footer">
+      <div class="container">
+        <p>© 2025 BlinkGames — Todos os direitos reservados.</p>
+      </div>
+    </footer>
+
+    <!-- Pac-Man -->
+    <div id="pacman-wrap"><canvas id="pacman-bg" height="58"></canvas></div>
+
+    <!-- Scripts -->
+    <script type="module" src="js/state.js"></script>
+    <script type="module" src="js/header.js"></script>
+    <script type="module" src="js/api.js"></script>
+    <script type="module" src="js/pacman-bg.js"></script>
+    <script type="module" src="js/nova-senha.js"></script>
+  </body>
+</html>
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Recuperar Senha — BlinkGames</title>
+
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Press+Start+2P&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      main {
+        max-width: 420px;
+        margin: 80px auto;
+        text-align: center;
+      }
+
+      .panel {
+        background: var(--panel);
+        padding: 32px;
+        border-radius: 16px;
+        box-shadow: 0 0 25px rgba(255, 0, 200, 0.15),
+          0 0 50px rgba(0, 224, 255, 0.1);
+      }
+
+      h1 {
+        color: var(--accent-2);
+        margin-bottom: 30px;
+        font-family: "Press Start 2P", cursive;
+        font-size: 1rem;
+        letter-spacing: 0.5px;
+      }
+
+      label {
+        display: block;
+        text-align: left;
+        margin-bottom: 6px;
+        color: #ccc;
+        font-size: 0.9rem;
+      }
+
+      input {
+        width: 100%;
+        padding: 10px 12px;
+        border-radius: 8px;
+        border: none;
+        background: #1c0135;
+        color: #fff;
+        font-size: 0.95rem;
+        outline: none;
+      }
+
+      input:focus {
+        box-shadow: 0 0 0 2px var(--accent);
+      }
+
+      .btn {
+        margin-top: 20px;
+        width: 100%;
+        padding: 12px;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        background: linear-gradient(90deg, var(--accent), var(--accent-2));
+        color: #fff;
+        font-weight: bold;
+        font-size: 1rem;
+        transition: opacity 0.2s ease, transform 0.2s ease;
+      }
+
+      .btn:hover {
+        opacity: 0.9;
+        transform: scale(1.02);
+      }
+
+      p {
+        color: #aaa;
+        font-size: 0.9rem;
+        margin-top: 18px;
+      }
+
+      a {
+        color: var(--accent-2);
+        text-decoration: none;
+      }
+
+      a:hover {
+        color: var(--accent);
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Cabeçalho -->
+    <div id="header"></div>
+
+    <!-- ============================================================ -->
+    <!-- 🔐 CONTEÚDO PRINCIPAL -->
+    <!-- ============================================================ -->
+    <main>
+      <h1>🔑 Recuperar Senha</h1>
+
+      <section class="panel">
+        <form id="recover-form">
+          <label for="recoverEmail">Digite seu e-mail cadastrado</label>
+          <input
+            type="email"
+            id="recoverEmail"
+            placeholder="seuemail@exemplo.com"
+            required
+          />
+
+          <button class="btn btn-primary" type="submit">
+            🚀 Enviar link de redefinição
+          </button>
+
+          <p>
+            🔙 Lembrou sua senha?
+            <a href="conta.html">Voltar para o login</a>
+          </p>
+        </form>
+
+        <p id="feedback" style="margin-top:14px; color:#0ff; font-size:0.9rem; display:none;">
+          <!-- mensagem dinâmica JS -->
+        </p>
+      </section>
+    </main>
+
+    <!-- Rodapé -->
+    <footer class="footer">
+      <div class="container">
+        <p>© 2025 BlinkGames — Todos os direitos reservados.</p>
+      </div>
+    </footer>
+
+    <!-- Animação Pac-Man -->
+    <div id="pacman-wrap"><canvas id="pacman-footer" height="58"></canvas></div>
+
+    <!-- Scripts -->
+    <script type="module" src="js/state.js"></script>
+    <script type="module" src="js/header.js"></script>
+    <script type="module" src="js/api.js"></script>
+    <script type="module" src="js/recuperar.js"></script>
+    <script type="module" src="js/pacman-bg.js"></script>
+
+    <script>
+      // 🧩 Feedback rápido (para UX sem recarregar)
+      const form = document.getElementById("recover-form");
+      const feedback = document.getElementById("feedback");
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const email = document.getElementById("recoverEmail").value.trim();
+
+        feedback.style.display = "block";
+        feedback.textContent = "⏳ Enviando link de recuperação...";
+
+        try {
+          // Simulação (aqui seu recuperar.js lida de fato com a API)
+          await new Promise((r) => setTimeout(r, 1500));
+          feedback.textContent = "✅ Link de redefinição enviado para " + email;
+        } catch {
+          feedback.textContent =
+            "❌ Ocorreu um erro. Verifique o e-mail e tente novamente.";
+        }
+      });
+    </script>
+  </body>
+</html>
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🎟️ Rifa — BlinkGames</title>
+
+  <link rel="manifest" href="site.webmanifest" />
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  <link rel="stylesheet" href="css/style.css" />
+
+  <style>
+    main {
+      margin-top: 60px;
+    }
+
+    .raffle-detail {
+      background: var(--panel);
+      border-radius: 16px;
+      padding: 28px;
+      box-shadow: 0 0 25px rgba(255, 0, 200, 0.1), 0 0 50px rgba(0, 224, 255, 0.08);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .raffle-detail img.cover {
+      width: 100%;
+      max-width: 550px;
+      height: auto;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 0, 200, 0.15);
+      box-shadow: 0 0 30px rgba(255, 0, 200, 0.12);
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      color: var(--accent-2);
+      font-size: 1.8rem;
+      margin-bottom: 10px;
+    }
+
+    p {
+      color: #ccc;
+      line-height: 1.6;
+      margin: 6px 0;
+    }
+
+    .qty {
+      margin: 18px 0;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .qty input {
+      width: 80px;
+      text-align: center;
+      background: #1c0135;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      color: #fff;
+      padding: 8px;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 10px;
+      padding: 10px 16px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .btn:hover {
+      opacity: 0.9;
+      transform: scale(1.05);
+    }
+
+    #add {
+      width: 100%;
+      max-width: 250px;
+      margin-top: 14px;
+      font-size: 1rem;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="header"></div>
+
+  <main class="container">
+    <article class="raffle-detail">
+      <img id="raffle-img" class="cover" src="img/icons/placeholder.svg" alt="Rifa" />
+
+      <div>
+        <h1 id="raffle-title">Carregando...</h1>
+        <p id="raffle-desc">Aguarde, estamos carregando as informações da rifa...</p>
+        <p><strong>💰 Preço:</strong> R$ <span id="raffle-price">0,00</span></p>
+        <p><strong>📅 Data do sorteio:</strong> <span id="raffle-date">31/12/2025</span></p>
+
+        <div class="qty">
+          <button class="btn" id="dec">−</button>
+          <input id="qty" type="number" value="1" min="1" />
+          <button class="btn" id="inc">+</button>
+        </div>
+
+        <button id="add" class="btn btn-primary">🛒 Adicionar ao carrinho</button>
+      </div>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p>© 2025 BlinkGames — Todos os direitos reservados.</p>
+    </div>
+  </footer>
+
+  <div id="pacman-wrap">
+    <canvas id="pacman-footer"></canvas>
+  </div>
+
+  <script type="module" src="js/state.js"></script>
+  <script type="module" src="js/header.js"></script>
+  <script type="module" src="js/api.js"></script>
+  <script type="module" src="js/rifa.js"></script>
+  <script type="module" src="js/pacman-bg.js"></script>
+
+  <script>
+    // Incremento e decremento direto (mantém funcionalidade JS inline separada)
+    document.addEventListener("DOMContentLoaded", () => {
+      const qtyInput = document.getElementById("qty");
+      document.getElementById("inc").addEventListener("click", () => {
+        qtyInput.value = Number(qtyInput.value) + 1;
+      });
+      document.getElementById("dec").addEventListener("click", () => {
+        qtyInput.value = Math.max(1, Number(qtyInput.value) - 1);
+      });
+    });
+  </script>
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🎮 Rifas — BlinkGames</title>
+
+  <link rel="manifest" href="site.webmanifest" />
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+
+  <style>
+    main {
+      margin-top: 60px;
+    }
+
+    h1 {
+      text-align: center;
+      color: var(--accent-2);
+      margin-bottom: 24px;
+    }
+
+    #raffles {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .raffle-card {
+      background: var(--panel);
+      border-radius: 14px;
+      box-shadow: 0 0 25px rgba(255, 0, 200, 0.12), 0 0 45px rgba(0, 224, 255, 0.08);
+      overflow: hidden;
+      transition: transform 0.2s ease, box-shadow 0.3s ease;
+    }
+
+    .raffle-card:hover {
+      transform: scale(1.03);
+      box-shadow: 0 0 30px rgba(255, 0, 200, 0.2), 0 0 60px rgba(0, 224, 255, 0.15);
+    }
+
+    .raffle-card img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
+
+    .raffle-card .info {
+      padding: 16px;
+      text-align: center;
+    }
+
+    .raffle-card h3 {
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+
+    .raffle-card p {
+      font-size: 0.95rem;
+      color: #ccc;
+      margin-bottom: 8px;
+    }
+
+    .raffle-card button {
+      margin-top: 8px;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 10px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .raffle-card button:hover {
+      opacity: 0.9;
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+
+<body>
+  <div id="header"></div>
+
+  <main class="container">
+    <h1>🎮 Rifas Ativas</h1>
+    <p style="text-align:center; opacity:0.8; margin-bottom:18px;">
+      Escolha sua rifa e participe! Quanto mais números, maiores as chances de vencer. 💥
+    </p>
+    <div id="raffles" class="grid"></div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p>© 2025 BlinkGames — Todos os direitos reservados.</p>
+    </div>
+  </footer>
+
+  <div id="pacman-wrap">
+    <canvas id="pacman-footer"></canvas>
+  </div>
+
+  <script type="module" src="js/state.js"></script>
+  <script type="module" src="js/header.js"></script>
+  <script type="module" src="js/api.js"></script>
+  <script type="module" src="js/rifas.js"></script>
+  <script type="module" src="js/pacman-bg.js"></script>
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🚀 Sobre — BlinkGames</title>
+
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  <link rel="manifest" href="site.webmanifest" />
+  <link rel="stylesheet" href="css/style.css" />
+
+  <style>
+    main {
+      margin-top: 60px;
+      line-height: 1.8;
+      text-align: center;
+    }
+
+    h1 {
+      color: var(--accent-2);
+      margin-bottom: 20px;
+    }
+
+    .panel {
+      background: var(--panel);
+      padding: 32px;
+      border-radius: 16px;
+      box-shadow: 0 0 25px rgba(255, 0, 200, 0.1), 0 0 50px rgba(0, 224, 255, 0.08);
+    }
+
+    strong {
+      color: var(--accent);
+    }
+
+    a {
+      color: var(--accent-2);
+      text-decoration: none;
+    }
+
+    a:hover {
+      color: var(--accent);
+    }
+
+    em {
+      color: var(--accent-3);
+    }
+  </style>
+</head>
+
+<body>
+  <div id="header"></div>
+
+  <main class="container">
+    <section class="panel">
+      <h1>🚀 Sobre a BlinkGames</h1>
+
+      <p>
+        A <strong>BlinkGames</strong> nasceu da paixão por <strong>tecnologia, inovação e cultura gamer</strong>.  
+        Somos uma startup brasileira dedicada a oferecer uma experiência de rifas <strong>100% digital, segura e justa</strong>,  
+        com visual <strong>neon retrô</strong> inspirado nos clássicos dos videogames — mas com alma moderna e tecnologia de ponta.
+      </p>
+
+      <p style="margin-top: 14px;">
+        Nosso propósito é <strong>transformar rifas em experiências</strong>.  
+        Cada número comprado é mais do que uma aposta — é um momento de emoção real, transparente e cheia de energia gamer.  
+        Aqui, o sorteio é o “game” e você é o protagonista.
+      </p>
+
+      <p style="margin-top: 14px;">
+        A plataforma é hospedada em <strong>infraestrutura cloud de alta performance</strong>,  
+        com <strong>pagamentos oficiais via Mercado Pago</strong> e <strong>segurança de dados criptografada</strong>.  
+        Tudo isso pra garantir uma jornada leve, confiável e cheia de estilo.
+      </p>
+
+      <div style="margin-top: 24px;">
+        <p>🌐 <strong>Plataforma:</strong> <a href="https://blinkgamesrifa.vercel.app" target="_blank">blinkgamesrifa.vercel.app</a></p>
+        <p>📧 <strong>Contato:</strong> blinkgamesoficial@hotmail.com</p>
+        <p>🎮 <strong>Fundadora:</strong> <span style="color: var(--accent-2);">Mel</span></p>
+      </div>
+
+      <div style="margin-top: 32px;">
+        <p style="font-size: 0.95rem; opacity: 0.9;">
+          💡 <em>"Blink" representa o instante em que o improvável acontece.  
+          Um piscar de olhos pode mudar o jogo — e é isso que nos move.</em>
+        </p>
+      </div>
+
+      <div style="margin-top: 28px;">
+        <p style="font-size: 0.9rem; opacity: 0.85;">Transparência, tecnologia e diversão — esse é o nosso jogo. 💜</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p>© 2025 BlinkGames — Todos os direitos reservados.</p>
+    </div>
+  </footer>
+
+  <div id="pacman-wrap">
+    <canvas id="pacman-footer"></canvas>
+  </div>
+
+  <script type="module" src="js/state.js"></script>
+  <script type="module" src="js/header.js"></script>
+  <script type="module" src="js/api.js"></script>
+  <script type="module" src="js/pacman-bg.js"></script>
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Pagamento Aprovado — BlinkGames</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0a0015">
+  <style>
+    body {
+      background:#0a0015;
+      color:white;
+      font-family:Inter,sans-serif;
+      text-align:center;
+      padding-top:80px;
+    }
+    h1 {
+      color:#00e0ff;
+      font-size:2rem;
+      margin-bottom:10px;
+    }
+    p {
+      color:#ccc;
+      font-size:1.1rem;
+      margin-bottom:30px;
+    }
+    a {
+      color:#ff00c8;
+      text-decoration:none;
+      font-weight:bold;
+      font-size:1rem;
+    }
+    a:hover {
+      text-decoration:underline;
+    }
+    .blink {
+      animation: pulse 1.2s infinite alternate;
+    }
+    @keyframes pulse {
+      from { opacity: 0.6; }
+      to { opacity: 1; }
+    }
+  </style>
+  <script>
+    // 🔹 Limpa carrinho e cache imediatamente
+    localStorage.removeItem("cart");
+    localStorage.removeItem("checkoutCache");
+
+    // 🔹 Aguarda e redireciona automaticamente
+    setTimeout(() => {
+      window.location.href = "minhas-rifas.html";
+    }, 3500);
+  </script>
+</head>
+<body>
+  <h1 class="blink">✅ Pagamento aprovado!</h1>
+  <p>Seus números foram registrados com sucesso.</p>
+  <p><a href="minhas-rifas.html">Ir para Minhas Rifas</a></p>
+  <small style="color:#888;">Você será redirecionado automaticamente...</small>
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>⚡ Termos e Condições — BlinkGames</title>
+
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  <link rel="manifest" href="site.webmanifest" />
+  <link rel="stylesheet" href="css/style.css" />
+
+  <style>
+    main {
+      margin-top: 60px;
+      line-height: 1.8;
+    }
+
+    h1 {
+      text-align: center;
+      color: var(--accent-2);
+      margin-bottom: 20px;
+    }
+
+    ul li {
+      margin-bottom: 10px;
+    }
+
+    strong {
+      color: var(--accent);
+    }
+
+    .panel {
+      background: var(--panel);
+      padding: 28px;
+      border-radius: 16px;
+      box-shadow: 0 0 25px rgba(255, 0, 200, 0.1), 0 0 50px rgba(0, 224, 255, 0.08);
+    }
+
+    a {
+      color: var(--accent-2);
+      text-decoration: none;
+    }
+
+    a:hover {
+      color: var(--accent);
+    }
+  </style>
+</head>
+
+<body>
+  <div id="header"></div>
+
+  <main class="container">
+    <section class="panel">
+      <h1>⚡ Termos e Condições</h1>
+
+      <p>Bem-vindo(a) à <strong>BlinkGames</strong> — o portal gamer oficial de rifas e sorteios de consoles, jogos e periféricos.
+      Ao participar de qualquer promoção, você declara estar ciente e de acordo com as condições abaixo:</p>
+
+      <ul style="margin-top: 16px; list-style: none; padding-left: 0;">
+        <li>🎮 Todas as rifas são realizadas de forma <strong>transparente e rastreável</strong>, com números únicos e conferência pública.</li>
+        <li>🏛️ Os sorteios seguem o <strong>modelo legal de premiação por sorteio</strong> previsto na Portaria nº 422/2013 do Ministério da Fazenda e nas normas da Caixa Econômica Federal.</li>
+        <li>👤 A participação é restrita a <strong>pessoas maiores de 18 anos</strong> com CPF válido e endereço no território nacional.</li>
+        <li>💳 Após a confirmação do pagamento, o número é considerado <strong>ativo e intransferível</strong>. Não há cancelamento ou reembolso, conforme o art. 49 do Código de Defesa do Consumidor (Lei 8.078/90), inciso que prevê exceção para serviços personalizados e de sorteios.</li>
+        <li>⏱️ Números reservados expiram em até <strong>10 minutos</strong> se o pagamento não for identificado, retornando automaticamente ao sistema.</li>
+        <li>🏆 Os vencedores são divulgados na página <a href="vencedores.html">Vencedores</a> e notificados por e-mail cadastrado.</li>
+        <li>⚙️ A BlinkGames se reserva o direito de <strong>adiar ou reagendar sorteios</strong> em caso de falhas técnicas, instabilidade de servidores ou motivos de força maior.</li>
+        <li>🕹️ É vedado o uso de bots, scripts automáticos ou qualquer meio que tente burlar o sistema. Casos suspeitos serão analisados e podem resultar em banimento.</li>
+      </ul>
+
+      <p style="margin-top: 20px;">
+        Ao participar, o usuário declara estar ciente de que a BlinkGames atua como <strong>plataforma intermediadora de rifas auditáveis e seguras</strong>,
+        cumprindo todas as diretrizes legais aplicáveis.
+      </p>
+
+      <p style="margin-top: 14px; opacity: 0.85;">
+        📧 Dúvidas? Fale com nosso suporte: <strong>blinkgamesoficial@hotmail.com</strong>
+      </p>
+
+      <p style="margin-top: 20px; font-size: 0.9rem; opacity: 0.75;">
+        © 2025 BlinkGames. Todos os direitos reservados.<br />
+        Plataforma auditável e segura.<br />
+        Certificação baseada nas diretrizes da Caixa Econômica Federal e Ministério da Fazenda.
+      </p>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p>© 2025 BlinkGames — Todos os direitos reservados.</p>
+    </div>
+  </footer>
+
+  <div id="pacman-wrap">
+    <canvas id="pacman-footer"></canvas>
+  </div>
+
+  <script type="module" src="js/state.js"></script>
+  <script type="module" src="js/header.js"></script>
+  <script type="module" src="js/api.js"></script>
+  <script type="module" src="js/pacman-bg.js"></script>
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🏆 Vencedores — BlinkGames</title>
+
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  <link rel="manifest" href="site.webmanifest" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+
+  <style>
+    main {
+      margin-top: 60px;
+    }
+
+    h1 {
+      text-align: center;
+      color: var(--accent-2);
+      margin-bottom: 25px;
+      font-size: 1.8rem;
+    }
+
+    .winner-card {
+      background: var(--panel);
+      border-radius: 18px;
+      padding: 20px;
+      box-shadow: 0 0 20px rgba(255, 0, 200, 0.12);
+      text-align: center;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .winner-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 0 30px rgba(0, 224, 255, 0.18);
+    }
+
+    .winner-name {
+      font-weight: bold;
+      color: #fff;
+      font-size: 1.1rem;
+      margin-bottom: 6px;
+    }
+
+    .winner-prize {
+      color: var(--accent-3);
+      font-weight: bold;
+      margin: 4px 0;
+    }
+
+    .winner-date {
+      color: #bbb;
+      font-size: 0.9rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 20px;
+      margin-top: 30px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="header"></div>
+
+  <main class="container">
+    <h1>🏆 Hall da Fama BlinkGames</h1>
+    <p style="text-align:center;opacity:.8;">Os sortudos que levaram os melhores prêmios pra casa 🎮✨</p>
+
+    <div id="winners" class="grid">
+      <div class="winner-card">
+        <div class="winner-name">Lucas Andrade</div>
+        <div class="winner-prize">🎁 PlayStation 5 — Edição Física</div>
+        <div class="winner-date">🏅 Sorteio: 28/10/2025</div>
+      </div>
+
+      <div class="winner-card">
+        <div class="winner-name">Ana Souza</div>
+        <div class="winner-prize">⌨️ Combo Gamer RGB (Teclado + Mouse)</div>
+        <div class="winner-date">🏅 Sorteio: 12/09/2025</div>
+      </div>
+
+      <div class="winner-card">
+        <div class="winner-name">Rafael Lima</div>
+        <div class="winner-prize">🎧 Headset HyperX Cloud II</div>
+        <div class="winner-date">🏅 Sorteio: 22/08/2025</div>
+      </div>
+
+      <div class="winner-card">
+        <div class="winner-name">Beatriz Santos</div>
+        <div class="winner-prize">🕹️ Controle DualSense — Edição Galactic Purple</div>
+        <div class="winner-date">🏅 Sorteio: 30/07/2025</div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p>© 2025 BlinkGames — Todos os direitos reservados.</p>
+    </div>
+  </footer>
+
+  <div id="pacman-wrap">
+    <canvas id="pacman-footer"></canvas>
+  </div>
+
+  <script type="module" src="js/state.js"></script>
+  <script type="module" src="js/header.js"></script>
+  <script type="module" src="js/api.js"></script>
+  <script type="module" src="js/pacman-bg.js"></script>
+</body>
+</html>
+

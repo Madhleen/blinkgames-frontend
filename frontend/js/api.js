@@ -1,5 +1,5 @@
 // ============================================================
-// 🌐 BlinkGames — api.js (v5.0 PRODUÇÃO — reserva alinhada)
+// 🌐 BlinkGames — api.js (v5.0 PRODUÇÃO — base única)
 // ============================================================
 
 const BASE = "https://blinkgames-backend-p4as.onrender.com";
@@ -29,7 +29,7 @@ export const RafflesAPI = {
   list: () => request("/api/raffles"),
   byId: (id) => request(`/api/raffles/${id}`),
 
-  // Gera números no backend (quando o usuário não escolheu manualmente)
+  // Gera números quando o usuário não escolhe manualmente
   generate: (id, quantidade = 1, token) =>
     request(`/api/raffles/${id}/generate`, "POST", { quantidade }, token),
 
@@ -53,7 +53,7 @@ export const AuthAPI = {
   register: (payload) => request("/api/auth/register", "POST", payload),
 };
 
-// Checkout
+// Checkout (sempre com usuário autenticado)
 export const CheckoutAPI = {
   create: async (payload, token) => {
     if (!token) throw new Error("Usuário não autenticado.");

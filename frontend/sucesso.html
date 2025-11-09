@@ -5,32 +5,34 @@
   <title>Pagamento Aprovado — BlinkGames</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#0a0015">
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+
   <style>
     body {
-      background:#0a0015;
-      color:white;
-      font-family:Inter,sans-serif;
-      text-align:center;
-      padding-top:80px;
+      background: #0a0015;
+      color: white;
+      font-family: Inter, sans-serif;
+      text-align: center;
+      padding-top: 80px;
     }
     h1 {
-      color:#00e0ff;
-      font-size:2rem;
-      margin-bottom:10px;
+      color: #00e0ff;
+      font-size: 2rem;
+      margin-bottom: 10px;
     }
     p {
-      color:#ccc;
-      font-size:1.1rem;
-      margin-bottom:30px;
+      color: #ccc;
+      font-size: 1.1rem;
+      margin-bottom: 30px;
     }
     a {
-      color:#ff00c8;
-      text-decoration:none;
-      font-weight:bold;
-      font-size:1rem;
+      color: #ff00c8;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 1rem;
     }
     a:hover {
-      text-decoration:underline;
+      text-decoration: underline;
     }
     .blink {
       animation: pulse 1.2s infinite alternate;
@@ -39,23 +41,22 @@
       from { opacity: 0.6; }
       to { opacity: 1; }
     }
+    .loading {
+      color: #ffde59;
+      font-size: 1.2rem;
+      opacity: 0.8;
+    }
   </style>
-  <script>
-    // 🔹 Limpa carrinho e cache imediatamente
-    localStorage.removeItem("cart");
-    localStorage.removeItem("checkoutCache");
-
-    // 🔹 Aguarda e redireciona automaticamente
-    setTimeout(() => {
-      window.location.href = "minhas-rifas.html";
-    }, 3500);
-  </script>
 </head>
+
 <body>
-  <h1 class="blink">✅ Pagamento aprovado!</h1>
-  <p>Seus números foram registrados com sucesso.</p>
-  <p><a href="minhas-rifas.html">Ir para Minhas Rifas</a></p>
-  <small style="color:#888;">Você será redirecionado automaticamente...</small>
+  <div id="msg">
+    <h1 class="loading">⏳ Confirmando pagamento...</h1>
+    <p>Aguarde enquanto validamos seu status no servidor.</p>
+  </div>
+
+  <!-- 🔹 Novo script modular -->
+  <script type="module" src="js/sucesso.js"></script>
 </body>
 </html>
 
