@@ -1,5 +1,5 @@
 // ============================================================
-// 🛒 BlinkGames — cart.js (v9.3 Produção Final — Render + Reserva + JWT)
+// 🛒 BlinkGames — cart.js (v9.5 Produção Corrigido — Quantidades + Badge vivo)
 // ============================================================
 
 import { mountHeader } from "./header.js";
@@ -9,7 +9,7 @@ import { RafflesAPI, CheckoutAPI } from "./api.js";
 mountHeader();
 
 // ============================================================
-// 🧩 Garante que o carrinho inválido seja limpo automaticamente
+// 🧩 Limpa carrinho inválido
 // ============================================================
 try {
   const c = JSON.parse(localStorage.getItem("blink_cart") || "[]");
@@ -18,29 +18,6 @@ try {
   localStorage.removeItem("blink_cart");
 }
 updateBadge();
-
-// ============================================================
-// 🔐 Função para garantir reserva dos números
-// ============================================================
-async function ensureReservation(item, token) {
-  const raffleId = item._id || item.raffleId || item.id;
-  if (!raffleId) throw new Error("Item sem raffleId válido");
-
-  let numeros = Array.isArray(item.numbers) ? item.numbers : [];
-
-  // Se não tem números, gera
-  if (!numeros.length) {
-    const gen = await RafflesAPI.generate(raffleId, item.quantity || 1, token);
-    numeros = gen?.numeros || gen?.numbers || [];
-  }
-
-  // Reserva os números
-  const res = await RafflesAPI.reserve(raffleId, numeros, token);
-  const reserved = res?.numeros || res?.numbers || numeros;
-  item.numbers = reserved;
-
-  return reserved;
-}
 
 // ============================================================
 // 🧾 Renderiza o conteúdo do carrinho
@@ -56,61 +33,90 @@ function renderCart() {
     list.innerHTML = "";
     empty.style.display = "block";
     totalEl.textContent = "R$ 0,00";
+    updateBadge();
     return;
   }
 
   empty.style.display = "none";
-
-  list.innerHTML = cart
-    .map(
-      (item, i) => `
+  list.innerHTML = cart.map((item, i) => `
     <li class="panel" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
       <div>
         <strong>${item.title}</strong><br>
         <small>${item.numbers?.join(", ") || "Números reservados"}</small><br>
-        <small>Qtd: ${item.quantity}</small>
+        <div style="margin-top:6px;">
+          <button class="btn-qty" data-action="minus" data-index="${i}">−</button>
+          <span style="margin:0 8px;">${item.quantity}</span>
+          <button class="btn-qty" data-action="plus" data-index="${i}">+</button>
+          <button class="btn-remove" data-index="${i}" style="margin-left:10px;">🗑️</button>
+        </div>
       </div>
-      <div>
-        <strong>${BRL(item.price * item.quantity)}</strong><br>
-        <button class="btn small" data-remove="${i}">🗑️ Remover</button>
-      </div>
+      <strong>${BRL(item.price * item.quantity)}</strong>
     </li>
-  `
-    )
-    .join("");
+  `).join("");
 
-  // Remove item do carrinho
-  list.querySelectorAll("[data-remove]").forEach((btn) => {
-    btn.addEventListener("click", (e) => {
-      const idx = parseInt(e.target.dataset.remove);
-      const updated = getCart().filter((_, i) => i !== idx);
-      saveCart(updated);
+  const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  totalEl.textContent = BRL(total);
+
+  attachEvents();
+}
+
+// ============================================================
+// ⚙️ Eventos de +, − e remover
+// ============================================================
+function attachEvents() {
+  document.querySelectorAll(".btn-qty").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const index = parseInt(btn.dataset.index);
+      const action = btn.dataset.action;
+      const cart = getCart();
+
+      if (action === "plus") cart[index].quantity++;
+      if (action === "minus" && cart[index].quantity > 1) cart[index].quantity--;
+
+      saveCart(cart);
+      updateBadge();
       renderCart();
     });
   });
 
-  const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  totalEl.textContent = BRL(total);
+  document.querySelectorAll(".btn-remove").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const index = parseInt(btn.dataset.index);
+      const cart = getCart();
+      cart.splice(index, 1);
+      saveCart(cart);
+      updateBadge();
+      renderCart();
+    });
+  });
 }
 
 // ============================================================
-// 🧹 Limpar o carrinho inteiro
+// 🧩 Reserva dos números antes do checkout
 // ============================================================
-function clearCart() {
-  localStorage.removeItem("blink_cart");
-  updateBadge();
-  renderCart();
+async function ensureReservation(item, token) {
+  const raffleId = item._id || item.raffleId || item.id;
+  if (!raffleId) throw new Error("Item sem raffleId válido");
+
+  let numeros = Array.isArray(item.numbers) ? item.numbers : [];
+
+  if (!numeros.length) {
+    const gen = await RafflesAPI.generate(raffleId, item.quantity || 1, token);
+    numeros = gen?.numeros || gen?.numbers || [];
+  }
+
+  const res = await RafflesAPI.reserve(raffleId, numeros, token);
+  const reserved = res?.numeros || res?.numbers || numeros;
+  item.numbers = reserved;
+  return reserved;
 }
 
 // ============================================================
-// 🛍️ Finalizar compra
+// 💳 Finalizar compra
 // ============================================================
 document.getElementById("checkout")?.addEventListener("click", async () => {
   const token = getToken();
   const cart = getCart();
-
-  console.log("🔐 Token atual:", token);
-  console.log("🛒 Carrinho atual:", cart);
 
   if (!token) {
     alert("⚠️ Você precisa estar logado para finalizar a compra!");
@@ -118,19 +124,14 @@ document.getElementById("checkout")?.addEventListener("click", async () => {
     window.location.href = "conta.html";
     return;
   }
-
   if (!cart.length) {
     alert("Seu carrinho está vazio!");
     return;
   }
 
   try {
-    for (const item of cart) {
-      await ensureReservation(item, token);
-    }
-
+    for (const item of cart) await ensureReservation(item, token);
     saveCart(cart);
-    updateBadge();
 
     const normalizedCart = cart.map((item) => ({
       raffleId: item._id || item.raffleId || item.id,
@@ -140,10 +141,7 @@ document.getElementById("checkout")?.addEventListener("click", async () => {
       numeros: item.numbers || [],
     }));
 
-    console.log("📦 Enviando checkout:", normalizedCart);
-
     const result = await CheckoutAPI.create({ cart: normalizedCart }, token);
-
     if (result?.init_point) {
       localStorage.setItem("checkoutCache", JSON.stringify(cart));
       window.location.href = result.init_point;
@@ -152,7 +150,6 @@ document.getElementById("checkout")?.addEventListener("click", async () => {
     }
   } catch (err) {
     console.error("❌ Erro no checkout/reserva:", err);
-
     const msg = String(err?.message || "").toLowerCase();
     if (msg.includes("unauthorized") || msg.includes("token")) {
       alert("Sessão expirada. Faça login novamente.");
@@ -160,19 +157,12 @@ document.getElementById("checkout")?.addEventListener("click", async () => {
       window.location.href = "conta.html";
       return;
     }
-
     alert(err.message || "Erro ao reservar/criar checkout.");
   }
 });
 
 // ============================================================
-// 🚀 Render inicial
+// 🚀 Inicializa
 // ============================================================
-document.addEventListener("DOMContentLoaded", () => {
-  renderCart();
-
-  // Botão limpar carrinho (se existir)
-  const clearBtn = document.getElementById("clear-cart");
-  if (clearBtn) clearBtn.addEventListener("click", clearCart);
-});
+document.addEventListener("DOMContentLoaded", renderCart);
 
