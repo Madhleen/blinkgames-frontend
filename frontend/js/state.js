@@ -1,43 +1,67 @@
 // ============================================================
-// 🎮 BlinkGames — state.js (v5.3)
+// 🎮 BlinkGames — state.js (v6.1 PRODUÇÃO ESTÁVEL CORRIGIDO)
 // ============================================================
 
 // 💰 Formata valores em Real
 export function BRL(n) {
   return (n || 0).toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
     minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
   });
 }
 
+// ============================================================
 // 🛒 Carrinho
+// ============================================================
 export function getCart() {
-  return JSON.parse(localStorage.getItem("blink_cart") || "[]");
+  try {
+    return JSON.parse(localStorage.getItem("blink_cart") || "[]");
+  } catch {
+    localStorage.removeItem("blink_cart");
+    return [];
+  }
 }
 
 export function saveCart(c) {
-  localStorage.setItem("blink_cart", JSON.stringify(c));
+  if (!Array.isArray(c) || c.length === 0) {
+    localStorage.removeItem("blink_cart");
+  } else {
+    localStorage.setItem("blink_cart", JSON.stringify(c));
+  }
   updateBadge();
 }
 
+// 🔹 Atualiza o número no ícone do carrinho
 export function updateBadge() {
-  const b = document.getElementById("cart-badge");
-  if (!b) return;
-  const c = getCart().reduce((s, i) => s + (i.quantity || 0), 0);
-  b.textContent = c > 0 ? c : "";
+  const badge = document.getElementById("cart-badge");
+  if (!badge) return;
+
+  const cart = getCart();
+  const total = cart.reduce((sum, i) => sum + (i.quantity || 0), 0);
+
+  if (total > 0) {
+    badge.textContent = total;
+    badge.style.display = "inline-block";
+  } else {
+    badge.textContent = "";
+    badge.style.display = "none";
+  }
 }
 
+// ============================================================
 // 👤 Autenticação e Usuário
+// ============================================================
 export function getToken() {
   return localStorage.getItem("blink_token") || null;
 }
 
-export function setToken(t) {
-  localStorage.setItem("blink_token", t || "");
+export function setToken(token) {
+  localStorage.setItem("blink_token", token || "");
 }
 
-export function setUser(u) {
-  localStorage.setItem("blink_user", JSON.stringify(u || {}));
+export function setUser(user) {
+  localStorage.setItem("blink_user", JSON.stringify(user || {}));
 }
 
 export function getUser() {
@@ -48,24 +72,28 @@ export function getUser() {
   }
 }
 
+// 🔹 Logout completo
 export function clearAuth() {
   localStorage.removeItem("blink_token");
   localStorage.removeItem("blink_user");
+  localStorage.removeItem("blink_cart");
   updateUserHeader();
+  updateBadge();
 }
 
 // ============================================================
-// 🌐 UI Dinâmica — Atualiza o Header com "Olá, Usuário"
+// 🌐 Atualiza o Header com nome do usuário logado
 // ============================================================
 export function updateUserHeader() {
   const user = getUser();
+  const token = getToken();
   const headerUser = document.getElementById("header-user");
   const headerAuth = document.getElementById("header-auth");
 
   if (!headerUser || !headerAuth) return;
 
   const nome = user?.nome || user?.name || "";
-  const logado = !!getToken() && !!nome;
+  const logado = !!token && !!nome;
 
   if (logado) {
     headerUser.innerHTML = `
@@ -85,6 +113,11 @@ export function updateUserHeader() {
   }
 }
 
-// Executa sempre que a página carrega
-document.addEventListener("DOMContentLoaded", updateUserHeader);
+// ============================================================
+// ⚡ Inicializa header e badge no carregamento
+// ============================================================
+document.addEventListener("DOMContentLoaded", () => {
+  updateUserHeader();
+  updateBadge();
+});
 
