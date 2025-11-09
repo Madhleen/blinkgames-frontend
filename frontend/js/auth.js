@@ -1,117 +1,118 @@
 // ============================================================
-// 👤 BlinkGames — auth.js (v5.0 Produção Corrigido)
+// 🔐 BlinkGames — auth.js (v7.8 Produção Corrigido DOM + Debug)
 // ============================================================
 
 import { mountHeader } from "./header.js";
 import { setToken, setUser } from "./state.js";
 
-mountHeader();
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("✅ auth.js carregado — aguardando formulários...");
+  mountHeader();
 
-// ============================================================
-// 🔢 Utilitário — limpa CPF
-// ============================================================
-function onlyDigits(s) {
-  return (s || "").replace(/\D/g, "");
-}
+  const loginForm = document.getElementById("login-form");
+  const registerForm = document.getElementById("register-form");
 
-// ============================================================
-// 🔐 LOGIN
-// ============================================================
-const login = document.getElementById("login-form");
-if (login) {
-  login.addEventListener("submit", async (e) => {
-    e.preventDefault();
+  // 🔢 Limpa CPF
+  function onlyDigits(s) {
+    return (s || "").replace(/\D/g, "");
+  }
 
-    const emailInput = document.getElementById("email");
-    const passInput = document.getElementById("password");
+  // ============================================================
+  // LOGIN
+  // ============================================================
+  if (loginForm) {
+    console.log("📩 Formulário de login detectado.");
+    loginForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
 
-    const email = emailInput?.value?.trim() || "";
-    const senha = passInput?.value?.trim() || ""; // ✅ nome compatível com backend
+      const email = document.querySelector("#email")?.value.trim();
+      const senha = document.querySelector("#password")?.value.trim();
 
-    if (!email || !senha) {
-      alert("⚠️ Preencha todos os campos.");
-      return;
-    }
-
-    try {
-      const res = await fetch("https://blinkgames-backend.onrender.com/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, senha }), // ✅ campo correto
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || data.message || "Falha no login.");
+      if (!email || !senha) {
+        alert("⚠️ Preencha todos os campos.");
+        return;
       }
 
-      if (data?.token) {
-        setToken(data.token);
-        setUser(data.user || { email });
-        alert("✅ Login realizado com sucesso!");
+      console.log("🔄 Enviando login para API...");
 
-        const redirect = localStorage.getItem("redirectAfterLogin");
-        localStorage.removeItem("redirectAfterLogin");
-        window.location.href = redirect || "index.html";
-      } else {
-        alert("Falha no login. Verifique suas credenciais.");
+      try {
+        const res = await fetch("https://blinkgames-backend-p4as.onrender.com/api/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, senha }),
+        });
+
+        const data = await res.json();
+        console.log("📦 Resposta login:", data);
+
+        if (!res.ok) throw new Error(data.error || data.message || "Falha no login.");
+
+        if (data.token) {
+          setToken(data.token);
+          setUser(data.user || { nome: "Usuário", email });
+          alert("✅ Login realizado com sucesso!");
+          window.location.href = "index.html";
+        }
+      } catch (err) {
+        console.error("❌ Erro ao logar:", err);
+        alert(err.message || "Erro ao efetuar login.");
       }
-    } catch (err) {
-      console.error("❌ Erro ao logar:", err);
-      alert(err.message || "Erro ao efetuar login.");
-    }
-  });
-}
+    });
+  } else {
+    console.warn("⚠️ Nenhum formulário de login encontrado.");
+  }
 
-// ============================================================
-// 🧾 REGISTRO — Cria conta e faz login automático
-// ============================================================
-const register = document.getElementById("register-form");
-if (register) {
-  register.addEventListener("submit", async (e) => {
-    e.preventDefault();
+  // ============================================================
+  // REGISTRO
+  // ============================================================
+  if (registerForm) {
+    console.log("🧾 Formulário de registro detectado.");
+    registerForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
 
-    const nome = document.getElementById("rname")?.value?.trim() || "";
-    const email = document.getElementById("remail")?.value?.trim() || "";
-    const cpf = onlyDigits(document.getElementById("rcpf")?.value);
-    const senha = document.getElementById("rpassword")?.value?.trim() || "";
-    const confirm = document.getElementById("rconfirm")?.value?.trim() || "";
+      const nome = document.querySelector("#rname")?.value.trim();
+      const email = document.querySelector("#remail")?.value.trim();
+      const cpf = onlyDigits(document.querySelector("#rcpf")?.value);
+      const senha = document.querySelector("#rpassword")?.value.trim();
+      const confirm = document.querySelector("#rconfirm")?.value.trim();
 
-    if (!nome || !email || !cpf || !senha || !confirm) {
-      alert("⚠️ Todos os campos são obrigatórios.");
-      return;
-    }
-
-    if (senha !== confirm) {
-      alert("⚠️ As senhas não conferem!");
-      return;
-    }
-
-    const payload = { nome, email, cpf, senha };
-
-    try {
-      const res = await fetch("https://blinkgames-backend.onrender.com/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || data.message || "Erro ao criar conta.");
-
-      alert("🎉 Conta criada com sucesso! Entrando...");
-
-      if (data.token) {
-        setToken(data.token);
-        setUser(data.user || { nome, email });
+      if (!nome || !email || !cpf || !senha || !confirm) {
+        alert("⚠️ Todos os campos são obrigatórios.");
+        return;
       }
 
-      window.location.href = "index.html";
-    } catch (err) {
-      console.error("❌ Erro no registro:", err);
-      alert(err.message || "Erro ao criar conta.");
-    }
-  });
-}
+      if (senha !== confirm) {
+        alert("⚠️ As senhas não conferem!");
+        return;
+      }
+
+      console.log("🚀 Enviando registro para API...");
+
+      try {
+        const res = await fetch("https://blinkgames-backend-p4as.onrender.com/api/auth/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ nome, email, cpf, senha }),
+        });
+
+        const data = await res.json();
+        console.log("📦 Resposta registro:", data);
+
+        if (!res.ok) throw new Error(data.error || data.message || "Erro ao criar conta.");
+
+        alert("🎉 Conta criada com sucesso!");
+
+        if (data.token) {
+          setToken(data.token);
+          setUser(data.user || { nome, email });
+        }
+
+        window.location.href = "index.html";
+      } catch (err) {
+        console.error("❌ Erro no registro:", err);
+        alert(err.message || "Erro ao criar conta.");
+      }
+    });
+  }
+});
 

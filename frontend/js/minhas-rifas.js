@@ -1,0 +1,64 @@
+// ============================================================
+// 🎟️ BlinkGames — minhas-rifas.js (v2.0 Produção Corrigido)
+// ============================================================
+
+import { getToken, BRL } from "./state.js";
+import { mountHeader } from "./header.js";
+
+document.addEventListener("DOMContentLoaded", () => {
+  mountHeader();
+  const rifaList = document.getElementById("rifaList");
+  const token = getToken();
+
+  if (!token) {
+    rifaList.innerHTML = `
+      <div class="panel" style="text-align:center; opacity:.85;">
+        <p>⚠️ Você precisa estar logado para visualizar suas rifas.</p>
+        <a href="conta.html" class="btn" style="margin-top:10px;">Fazer login</a>
+      </div>
+    `;
+    return;
+  }
+
+  loadRifas(token, rifaList);
+});
+
+// ============================================================
+// 🧾 Carrega rifas compradas do usuário autenticado
+// ============================================================
+async function loadRifas(token, rifaList) {
+  try {
+    const res = await fetch("https://blinkgames-backend-p4as.onrender.com/api/auth/me", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    const user = await res.json();
+    console.log("📦 Dados do usuário:", user);
+
+    if (!user || !Array.isArray(user.purchases) || !user.purchases.length) {
+      rifaList.innerHTML = `<p style="opacity:.8;">Você ainda não possui rifas compradas.</p>`;
+      return;
+    }
+
+    rifaList.innerHTML = user.purchases
+      .map(
+        (compra) => `
+        <li class="panel" style="margin-bottom: 12px;">
+          <strong>🎮 Rifa: ${compra.raffleId}</strong><br>
+          <small>Pagamento: <span style="color: var(--accent-2);">${compra.paymentId || "—"}</span></small><br>
+          <small>Valor: <strong>${BRL(compra.precoUnit * compra.numeros.length)}</strong></small><br>
+          <small>Data: ${new Date(compra.date).toLocaleDateString("pt-BR")}</small>
+          <p style="margin-top:8px;">
+            <strong>Números:</strong><br>
+            ${compra.numeros.join(", ")}
+          </p>
+        </li>
+      `
+      )
+      .join("");
+  } catch (err) {
+    console.error("❌ Erro ao carregar rifas:", err);
+    rifaList.innerHTML = "<p>Erro ao carregar rifas. Tente novamente mais tarde.</p>";
+  }
+}
+
