@@ -1,5 +1,5 @@
 // ============================================================
-// 🛒 BlinkGames — cart.js (v9.5 Produção Corrigido — Quantidades + Badge vivo)
+// 🛒 BlinkGames — cart.js (v9.5 Fix Final — Reserva + Botões + JWT)
 // ============================================================
 
 import { mountHeader } from "./header.js";
@@ -9,7 +9,7 @@ import { RafflesAPI, CheckoutAPI } from "./api.js";
 mountHeader();
 
 // ============================================================
-// 🧩 Limpa carrinho inválido
+// 🧩 Garante que o carrinho inválido seja limpo automaticamente
 // ============================================================
 try {
   const c = JSON.parse(localStorage.getItem("blink_cart") || "[]");
@@ -20,79 +20,7 @@ try {
 updateBadge();
 
 // ============================================================
-// 🧾 Renderiza o conteúdo do carrinho
-// ============================================================
-function renderCart() {
-  const list = document.getElementById("list");
-  const empty = document.getElementById("empty");
-  const totalEl = document.getElementById("total");
-
-  const cart = getCart();
-
-  if (!cart.length) {
-    list.innerHTML = "";
-    empty.style.display = "block";
-    totalEl.textContent = "R$ 0,00";
-    updateBadge();
-    return;
-  }
-
-  empty.style.display = "none";
-  list.innerHTML = cart.map((item, i) => `
-    <li class="panel" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-      <div>
-        <strong>${item.title}</strong><br>
-        <small>${item.numbers?.join(", ") || "Números reservados"}</small><br>
-        <div style="margin-top:6px;">
-          <button class="btn-qty" data-action="minus" data-index="${i}">−</button>
-          <span style="margin:0 8px;">${item.quantity}</span>
-          <button class="btn-qty" data-action="plus" data-index="${i}">+</button>
-          <button class="btn-remove" data-index="${i}" style="margin-left:10px;">🗑️</button>
-        </div>
-      </div>
-      <strong>${BRL(item.price * item.quantity)}</strong>
-    </li>
-  `).join("");
-
-  const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  totalEl.textContent = BRL(total);
-
-  attachEvents();
-}
-
-// ============================================================
-// ⚙️ Eventos de +, − e remover
-// ============================================================
-function attachEvents() {
-  document.querySelectorAll(".btn-qty").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const index = parseInt(btn.dataset.index);
-      const action = btn.dataset.action;
-      const cart = getCart();
-
-      if (action === "plus") cart[index].quantity++;
-      if (action === "minus" && cart[index].quantity > 1) cart[index].quantity--;
-
-      saveCart(cart);
-      updateBadge();
-      renderCart();
-    });
-  });
-
-  document.querySelectorAll(".btn-remove").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const index = parseInt(btn.dataset.index);
-      const cart = getCart();
-      cart.splice(index, 1);
-      saveCart(cart);
-      updateBadge();
-      renderCart();
-    });
-  });
-}
-
-// ============================================================
-// 🧩 Reserva dos números antes do checkout
+// 🔐 Reserva de números
 // ============================================================
 async function ensureReservation(item, token) {
   const raffleId = item._id || item.raffleId || item.id;
@@ -108,11 +36,78 @@ async function ensureReservation(item, token) {
   const res = await RafflesAPI.reserve(raffleId, numeros, token);
   const reserved = res?.numeros || res?.numbers || numeros;
   item.numbers = reserved;
+
   return reserved;
 }
 
 // ============================================================
-// 💳 Finalizar compra
+// 🧾 Renderiza o conteúdo do carrinho
+// ============================================================
+function renderCart() {
+  const list = document.getElementById("list");
+  const empty = document.getElementById("empty");
+  const totalEl = document.getElementById("total");
+
+  const cart = getCart();
+
+  if (!cart.length) {
+    list.innerHTML = "";
+    empty.style.display = "block";
+    totalEl.textContent = "R$ 0,00";
+    return;
+  }
+
+  empty.style.display = "none";
+
+  list.innerHTML = cart.map((item, i) => `
+    <li class="panel" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+      <div>
+        <strong>${item.title}</strong><br>
+        <small>${item.numbers?.join(", ") || "Números reservados"}</small><br>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:4px;">
+          <button class="qty-btn" data-action="dec" data-index="${i}">➖</button>
+          <span>${item.quantity}</span>
+          <button class="qty-btn" data-action="inc" data-index="${i}">➕</button>
+          <button class="remove-btn" data-index="${i}">🗑️</button>
+        </div>
+      </div>
+      <strong>${BRL(item.price * item.quantity)}</strong>
+    </li>
+  `).join("");
+
+  const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  totalEl.textContent = BRL(total);
+
+  // 🔁 Liga eventos nos botões
+  document.querySelectorAll(".qty-btn").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      const index = e.target.dataset.index;
+      const action = e.target.dataset.action;
+      const cart = getCart();
+
+      if (action === "inc") cart[index].quantity++;
+      if (action === "dec" && cart[index].quantity > 1) cart[index].quantity--;
+
+      saveCart(cart);
+      renderCart();
+    });
+  });
+
+  document.querySelectorAll(".remove-btn").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      const index = e.target.dataset.index;
+      const cart = getCart();
+      cart.splice(index, 1);
+      saveCart(cart);
+      renderCart();
+    });
+  });
+}
+
+document.addEventListener("DOMContentLoaded", renderCart);
+
+// ============================================================
+// 🛍️ Finalizar compra
 // ============================================================
 document.getElementById("checkout")?.addEventListener("click", async () => {
   const token = getToken();
@@ -124,6 +119,7 @@ document.getElementById("checkout")?.addEventListener("click", async () => {
     window.location.href = "conta.html";
     return;
   }
+
   if (!cart.length) {
     alert("Seu carrinho está vazio!");
     return;
@@ -132,6 +128,7 @@ document.getElementById("checkout")?.addEventListener("click", async () => {
   try {
     for (const item of cart) await ensureReservation(item, token);
     saveCart(cart);
+    updateBadge();
 
     const normalizedCart = cart.map((item) => ({
       raffleId: item._id || item.raffleId || item.id,
@@ -142,6 +139,7 @@ document.getElementById("checkout")?.addEventListener("click", async () => {
     }));
 
     const result = await CheckoutAPI.create({ cart: normalizedCart }, token);
+
     if (result?.init_point) {
       localStorage.setItem("checkoutCache", JSON.stringify(cart));
       window.location.href = result.init_point;
@@ -150,6 +148,7 @@ document.getElementById("checkout")?.addEventListener("click", async () => {
     }
   } catch (err) {
     console.error("❌ Erro no checkout/reserva:", err);
+
     const msg = String(err?.message || "").toLowerCase();
     if (msg.includes("unauthorized") || msg.includes("token")) {
       alert("Sessão expirada. Faça login novamente.");
@@ -157,12 +156,8 @@ document.getElementById("checkout")?.addEventListener("click", async () => {
       window.location.href = "conta.html";
       return;
     }
+
     alert(err.message || "Erro ao reservar/criar checkout.");
   }
 });
-
-// ============================================================
-// 🚀 Inicializa
-// ============================================================
-document.addEventListener("DOMContentLoaded", renderCart);
 
