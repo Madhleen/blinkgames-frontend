@@ -1,9 +1,12 @@
 // ============================================================
-// 🎮 BlinkGames — header.js (v5.5 ROBUSTO FINAL)
+// 🎮 BlinkGames — header.js (v5.6 LIMPO FINAL)
 // ============================================================
 
 import { updateBadge, getToken, getUser, clearAuth } from './state.js';
 
+// ============================================================
+// 🔗 Links fixos do menu
+// ============================================================
 const LINKS = [
   { href: 'index.html', label: 'Home' },
   { href: 'rifas.html', label: 'Rifas' },
@@ -13,7 +16,12 @@ const LINKS = [
 ];
 
 // ============================================================
-// 🔎 Detecta página ativa (funciona em Render/Vercel)
+// 🚫 Evita múltiplas renderizações do header
+// ============================================================
+let headerMounted = false;
+
+// ============================================================
+// 🔍 Detecta página ativa (Render/Vercel)
 // ============================================================
 function isActive(href) {
   const current = window.location.pathname.split('/').pop() || 'index.html';
@@ -21,9 +29,12 @@ function isActive(href) {
 }
 
 // ============================================================
-// 🧱 Monta o cabeçalho
+// 🧱 Monta o cabeçalho dinâmico
 // ============================================================
 export function mountHeader() {
+  if (headerMounted) return; // 🔒 evita duplicar
+  headerMounted = true;
+
   const el = document.getElementById('header');
   if (!el) return;
 
@@ -51,6 +62,9 @@ export function mountHeader() {
         </div>
       `;
 
+  // ============================================================
+  // 🧩 HTML do Header
+  // ============================================================
   el.innerHTML = `
     <header class="site">
       <div class="header-inner">
@@ -71,25 +85,25 @@ export function mountHeader() {
   `;
 
   // ============================================================
-  // 🚪 Logout
+  // 🚪 Logout dinâmico
   // ============================================================
   const logoutBtn = document.getElementById('logout');
   if (logoutBtn) {
     logoutBtn.addEventListener('click', (e) => {
       e.preventDefault();
       clearAuth();
-      mountHeader(); // 🔄 Recarrega o header após logout
+      window.location.href = 'index.html';
     });
   }
 
   // ============================================================
-  // 🧩 Badge
+  // 🔢 Atualiza badge do carrinho
   // ============================================================
   updateBadge();
 }
 
 // ============================================================
-// 🚀 Garante que o header é montado em TODAS as páginas
+// 🚀 Garante montagem do header após carregamento da página
 // ============================================================
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', mountHeader);
