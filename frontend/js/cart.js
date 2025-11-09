@@ -1,45 +1,35 @@
 // ============================================================
-// 🛒 BlinkGames — cart.js (v8.0 Produção Final — Reserva + JWT)
+// 🛒 BlinkGames — cart.js (v9.0 Reserva + Fallback + JWT)
 // ============================================================
 
 import { mountHeader } from "./header.js";
 import { BRL, getCart, saveCart, updateBadge, getToken } from "./state.js";
-import { CheckoutAPI } from "./api.js";
+import { RafflesAPI, CheckoutAPI } from "./api.js";
 
 mountHeader();
 
-// ============================================================
-// 🧾 Reserva dos números antes do checkout
-// ============================================================
-async function reservarNumeros(raffleId, numeros, token) {
-  try {
-    const res = await fetch(`https://blinkgames-backend-p4as.onrender.com/api/raffles/${raffleId}/reserve`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ numeros }),
-    });
+// Garante reserva para um item do carrinho
+async function ensureReservation(item, token) {
+  const raffleId = item._id || item.raffleId || item.id;
+  if (!raffleId) throw new Error("Item sem raffleId");
 
-    if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.error || "Erro ao reservar números");
-    }
-
-    const data = await res.json();
-    console.log("✅ Reserva confirmada:", data);
-    return data;
-  } catch (err) {
-    console.error("❌ Erro ao reservar:", err);
-    alert("Erro ao reservar números. Tente novamente.");
-    throw err;
+  // 1) se não há números, tenta gerar no backend
+  let numeros = Array.isArray(item.numbers) ? item.numbers : [];
+  if (!numeros.length) {
+    const gen = await RafflesAPI.generate(raffleId, item.quantity || 1, token);
+    numeros = gen?.numeros || gen?.numbers || [];
   }
+
+  // 2) reserva de fato
+  const res = await RafflesAPI.reserve(raffleId, numeros, token);
+  const reserved = res?.numeros || res?.numbers || numeros;
+
+  // 3) persiste no item
+  item.numbers = reserved;
+  return reserved;
 }
 
-// ============================================================
-// 🧾 Evento de finalizar compra
-// ============================================================
+// Finalizar compra
 document.getElementById("checkout")?.addEventListener("click", async () => {
   const token = getToken();
   const cart = getCart();
@@ -50,38 +40,29 @@ document.getElementById("checkout")?.addEventListener("click", async () => {
     window.location.href = "conta.html";
     return;
   }
-
   if (!cart.length) {
     alert("Seu carrinho está vazio!");
     return;
   }
 
-  // Reserva todos os números do carrinho antes de criar o checkout
-  for (const item of cart) {
-    const raffleId = item._id || item.raffleId || item.id;
-    const numeros = item.numbers || [];
-
-    try {
-      await reservarNumeros(raffleId, numeros, token);
-    } catch {
-      alert(`Erro ao reservar números da rifa ${item.title || "sem título"}.`);
-      return;
-    }
-  }
-
-  const normalizedCart = cart.map((item) => ({
-    raffleId: item._id || item.raffleId || item.id,
-    title: item.title || "Rifa BlinkGames",
-    price: Number(item.price) || 1,
-    quantity: Number(item.quantity) || 1,
-    numeros: item.numbers || [],
-  }));
-
   try {
-    console.log("🧾 Enviando carrinho:", normalizedCart);
-    const result = await CheckoutAPI.create({ cart: normalizedCart }, token);
-    console.log("💳 Resposta:", result);
+    // Reserva item a item (gera se necessário)
+    for (const item of cart) {
+      await ensureReservation(item, token);
+    }
+    // salva números reservados no armazenamento local
+    saveCart(cart);
 
+    // Normaliza payload do checkout
+    const normalizedCart = cart.map((item) => ({
+      raffleId: item._id || item.raffleId || item.id,
+      title: item.title || "Rifa BlinkGames",
+      price: Number(item.price) || 1,
+      quantity: Number(item.quantity) || 1,
+      numeros: item.numbers || [],
+    }));
+
+    const result = await CheckoutAPI.create({ cart: normalizedCart }, token);
     if (result?.init_point) {
       localStorage.setItem("checkoutCache", JSON.stringify(cart));
       window.location.href = result.init_point;
@@ -89,8 +70,15 @@ document.getElementById("checkout")?.addEventListener("click", async () => {
       alert("Erro ao criar checkout.");
     }
   } catch (err) {
-    console.error("❌ Erro no checkout:", err);
-    alert(err.message || "Erro ao criar checkout");
+    console.error("❌ Erro no checkout/reserva:", err);
+    const msg = String(err?.message || "").toLowerCase();
+    if (msg.includes("unauthorized") || msg.includes("token")) {
+      alert("Sessão expirada. Faça login novamente.");
+      localStorage.setItem("redirectAfterLogin", "carrinho.html");
+      window.location.href = "conta.html";
+      return;
+    }
+    alert(err.message || "Erro ao reservar/criar checkout.");
   }
 });
 
