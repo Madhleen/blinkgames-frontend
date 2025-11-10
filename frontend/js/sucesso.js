@@ -1,11 +1,11 @@
 // ============================================================
-// 🎉 BlinkGames — sucesso.js (v2.0 Integrado ao Backend)
+// 🎉 BlinkGames — sucesso.js (v3.5 Estável — Valida com backend)
 // ============================================================
 
 import { getToken, clearAuth } from "./state.js";
-import { OrdersAPI } from "./api.js";
+import { AuthAPI } from "./api.js"; // ✅ usa AuthAPI, pois as compras estão em /api/auth/me
 
-async function initSuccess() {
+async function verificarPagamento() {
   const token = getToken();
   if (!token) {
     alert("Sessão expirada. Faça login novamente.");
@@ -14,17 +14,30 @@ async function initSuccess() {
     return;
   }
 
+  const msg = document.getElementById("msg");
+  msg.innerHTML = `
+    <h1 class="loading">⏳ Confirmando pagamento...</h1>
+    <p>Aguarde enquanto validamos seu status no servidor.</p>
+  `;
+
   try {
-    // 🔍 Verifica se há pedidos confirmados no backend
-    const orders = await OrdersAPI.getMyOrders(token);
-    const hasPaid = orders?.some(o => o.status === "approved");
+    // 🔍 Busca dados do usuário e suas compras
+    const user = await AuthAPI.me(token);
+    const purchases = user?.purchases || [];
+
+    const hasPaid = purchases.some((p) => {
+      if (Array.isArray(p.items)) {
+        return p.items.some((i) => i && i.status === "approved");
+      }
+      return p.status === "approved";
+    });
 
     if (hasPaid) {
-      // 🧹 Limpa cache local
+      // ✅ Pagamento confirmado
       localStorage.removeItem("blink_cart");
       localStorage.removeItem("checkoutCache");
 
-      document.getElementById("msg").innerHTML = `
+      msg.innerHTML = `
         <h1 class="blink">✅ Pagamento aprovado!</h1>
         <p>Seus números foram registrados com sucesso.</p>
         <p><a href="minhas-rifas.html">Ir para Minhas Rifas</a></p>
@@ -35,17 +48,25 @@ async function initSuccess() {
         window.location.href = "minhas-rifas.html";
       }, 3500);
     } else {
-      document.getElementById("msg").innerHTML = `
+      // 🕓 Pagamento ainda pendente
+      msg.innerHTML = `
         <h1>⏳ Pagamento pendente</h1>
         <p>Estamos aguardando a confirmação do Mercado Pago...</p>
         <p><a href="minhas-rifas.html">Ver Minhas Rifas</a></p>
       `;
+
+      // 🔁 tenta novamente em 5s
+      setTimeout(verificarPagamento, 5000);
     }
   } catch (err) {
-    console.error("Erro ao confirmar pagamento:", err);
-    alert("Erro ao verificar pagamento. Tente novamente mais tarde.");
+    console.error("❌ Erro ao confirmar pagamento:", err);
+    msg.innerHTML = `
+      <h1>⚠️ Erro</h1>
+      <p>Não foi possível verificar o status do pagamento.</p>
+      <p><a href="minhas-rifas.html">Minhas Rifas</a></p>
+    `;
   }
 }
 
-document.addEventListener("DOMContentLoaded", initSuccess);
+document.addEventListener("DOMContentLoaded", verificarPagamento);
 

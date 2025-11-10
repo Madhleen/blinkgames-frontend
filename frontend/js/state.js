@@ -1,5 +1,5 @@
 // ============================================================
-// 🎮 BlinkGames — state.js (v6.0 FINAL SINCRONIZADO)
+// 🎮 BlinkGames — state.js (v6.2 TOTALMENTE SINCRONIZADO)
 // ============================================================
 
 // 💰 Formata valores em Real
@@ -11,10 +11,14 @@ export function BRL(n) {
   });
 }
 
-// 🛒 ===================== CARRINHO =====================
+// ============================================================
+// 🛒 CARRINHO
+// ============================================================
 export function getCart() {
   try {
-    return JSON.parse(localStorage.getItem("blink_cart") || "[]");
+    const data = localStorage.getItem("blink_cart");
+    const cart = JSON.parse(data || "[]");
+    return Array.isArray(cart) ? cart : [];
   } catch {
     return [];
   }
@@ -23,11 +27,14 @@ export function getCart() {
 export function saveCart(c) {
   localStorage.setItem("blink_cart", JSON.stringify(c || []));
   updateBadge();
+  // 🔄 Dispara evento pra header.js atualizar badge em tempo real
+  window.dispatchEvent(new Event("storage"));
 }
 
 export function clearCart() {
   localStorage.removeItem("blink_cart");
   updateBadge();
+  window.dispatchEvent(new Event("storage"));
 }
 
 export function updateBadge() {
@@ -38,12 +45,19 @@ export function updateBadge() {
   const totalItens = cart.reduce((acc, i) => acc + (i.quantity || 0), 0);
 
   badge.textContent = totalItens > 0 ? totalItens : "";
-  // Atualiza também o número no texto do header (Carrinho X)
+
+  // Atualiza também o texto do link “Carrinho”
   const linkCarrinho = document.querySelector('a[href="carrinho.html"]');
-  if (linkCarrinho) linkCarrinho.textContent = `Carrinho ${totalItens > 0 ? totalItens : ""}`;
+  if (linkCarrinho) {
+    linkCarrinho.innerHTML = `
+      Carrinho <span id="cart-badge" class="badge">${totalItens > 0 ? totalItens : ""}</span>
+    `;
+  }
 }
 
-// 👤 ===================== AUTENTICAÇÃO =====================
+// ============================================================
+// 👤 AUTENTICAÇÃO
+// ============================================================
 export function getToken() {
   return localStorage.getItem("blink_token") || null;
 }
@@ -67,11 +81,13 @@ export function setUser(u) {
 export function clearAuth() {
   localStorage.removeItem("blink_token");
   localStorage.removeItem("blink_user");
-  clearCart(); // ✅ também limpa carrinho ao sair
+  clearCart();
   updateUserHeader();
 }
 
-// ===================== HEADER DINÂMICO =====================
+// ============================================================
+// 🌐 HEADER DINÂMICO
+// ============================================================
 export function updateUserHeader() {
   const user = getUser();
   const nome = user?.nome || user?.name || "";
@@ -99,7 +115,9 @@ export function updateUserHeader() {
   updateBadge();
 }
 
-// Garante atualização em todas as páginas
+// ============================================================
+// 🚀 Inicialização global
+// ============================================================
 document.addEventListener("DOMContentLoaded", () => {
   updateBadge();
   updateUserHeader();

@@ -1,11 +1,12 @@
 // ============================================================
-// 🎟️ BlinkGames — minhas-rifas.js (v2.0 Produção Corrigido)
+// 🎟️ BlinkGames — minhas-rifas.js (v3.0 FINAL Produção)
 // ============================================================
 
 import { getToken, BRL } from "./state.js";
 import { mountHeader } from "./header.js";
+import { OrdersAPI } from "./api.js";
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   mountHeader();
   const rifaList = document.getElementById("rifaList");
   const token = getToken();
@@ -20,37 +21,36 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  loadRifas(token, rifaList);
-});
-
-// ============================================================
-// 🧾 Carrega rifas compradas do usuário autenticado
-// ============================================================
-async function loadRifas(token, rifaList) {
   try {
-    const res = await fetch("https://blinkgames-backend-p4as.onrender.com/api/auth/me", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const orders = await OrdersAPI.getMyOrders(token);
+    console.log("📦 Compras recebidas:", orders);
 
-    const user = await res.json();
-    console.log("📦 Dados do usuário:", user);
-
-    if (!user || !Array.isArray(user.purchases) || !user.purchases.length) {
+    if (!orders || !orders.length) {
       rifaList.innerHTML = `<p style="opacity:.8;">Você ainda não possui rifas compradas.</p>`;
       return;
     }
 
-    rifaList.innerHTML = user.purchases
+    // Renderiza cada compra com seus números e dados
+    rifaList.innerHTML = orders
       .map(
-        (compra) => `
-        <li class="panel" style="margin-bottom: 12px;">
-          <strong>🎮 Rifa: ${compra.raffleId}</strong><br>
-          <small>Pagamento: <span style="color: var(--accent-2);">${compra.paymentId || "—"}</span></small><br>
-          <small>Valor: <strong>${BRL(compra.precoUnit * compra.numeros.length)}</strong></small><br>
-          <small>Data: ${new Date(compra.date).toLocaleDateString("pt-BR")}</small>
+        (order) => `
+        <li class="panel" style="margin-bottom: 14px;">
+          <strong>🎮 ${order.items?.[0]?.title || "Rifa BlinkGames"}</strong><br>
+          <small>Status: <strong style="color:${
+            order.status === "approved" ? "#0f0" : "#ffde59"
+          };">${order.status}</strong></small><br>
+          <small>Pagamento: <span style="color:var(--accent-2);">${
+            order.paymentId || "—"
+          }</span></small><br>
+          <small>Valor: <strong>${BRL(order.total || 0)}</strong></small><br>
+          <small>Data: ${new Date(order.createdAt).toLocaleDateString("pt-BR")}</small>
+
           <p style="margin-top:8px;">
             <strong>Números:</strong><br>
-            ${compra.numeros.join(", ")}
+            ${
+              order.items?.flatMap((i) => i.numeros || []).join(", ") ||
+              "Nenhum número registrado."
+            }
           </p>
         </li>
       `
@@ -58,7 +58,11 @@ async function loadRifas(token, rifaList) {
       .join("");
   } catch (err) {
     console.error("❌ Erro ao carregar rifas:", err);
-    rifaList.innerHTML = "<p>Erro ao carregar rifas. Tente novamente mais tarde.</p>";
+    rifaList.innerHTML = `
+      <div class="panel" style="text-align:center;opacity:.8;">
+        <p>❌ Erro ao carregar suas rifas. Tente novamente mais tarde.</p>
+      </div>
+    `;
   }
-}
+});
 
