@@ -1,5 +1,5 @@
 // ============================================================
-// 🛒 BlinkGames — cart.js (v9.8 Produção — Reserva Dinâmica + Neon UI)
+// 🛒 BlinkGames — cart.js (v9.9 Final — Checkout Corrigido + Neon UI)
 // ============================================================
 
 import { mountHeader } from "./header.js";
@@ -189,7 +189,7 @@ function renderCart() {
 document.addEventListener("DOMContentLoaded", renderCart);
 
 // ============================================================
-// 💳 Finalizar compra
+// 💳 Finalizar compra (corrigido para SDK Mercado Pago v2)
 // ============================================================
 document.getElementById("checkout")?.addEventListener("click", async () => {
   const token = getToken();
@@ -208,11 +208,13 @@ document.getElementById("checkout")?.addEventListener("click", async () => {
   }
 
   try {
+    // 🔹 Atualiza reservas
     for (const item of cart) await ensureReservation(item, token);
 
     saveCart(cart);
     updateBadge();
 
+    // 🔹 Normaliza payload
     const normalizedCart = cart.map((item) => ({
       raffleId: item._id || item.raffleId || item.id,
       title: item.title || "Rifa BlinkGames",
@@ -221,13 +223,23 @@ document.getElementById("checkout")?.addEventListener("click", async () => {
       numeros: Array.isArray(item.numbers) ? item.numbers : [],
     }));
 
+    // 🔹 Cria checkout
     const result = await CheckoutAPI.create({ cart: normalizedCart }, token);
+    console.log("🧾 Retorno do backend:", result);
 
-    if (result?.init_point) {
+    // 🔁 Corrige leitura para SDK MP v2
+    const initPoint =
+      result?.init_point ||
+      result?.body?.init_point ||
+      result?.preference?.init_point ||
+      result?.sandbox_init_point;
+
+    if (initPoint) {
       localStorage.setItem("checkoutCache", JSON.stringify(cart));
-      window.location.href = result.init_point;
+      window.location.href = initPoint;
     } else {
-      alert("Erro ao criar checkout.");
+      console.error("❌ Checkout inválido:", result);
+      alert("Erro ao criar checkout (resposta inesperada do servidor).");
     }
   } catch (err) {
     console.error("❌ Erro no checkout/reserva:", err);
