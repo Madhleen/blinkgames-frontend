@@ -1,5 +1,5 @@
 // ============================================================
-// 🛒 BlinkGames — cart.js (v9.9 Final — Checkout Corrigido + Neon UI)
+// 🛒 BlinkGames — cart.js (v10.0 Final — Checkout Corrigido + Neon UI)
 // ============================================================
 
 import { mountHeader } from "./header.js";
@@ -65,7 +65,7 @@ try {
 updateBadge();
 
 // ============================================================
-// 🔐 Reserva dinâmica de números (gera, corta e sincroniza conforme a quantidade)
+// 🔐 Reserva dinâmica de números
 // ============================================================
 async function ensureReservation(item, token) {
   const raffleId = item._id || item.raffleId || item.id;
@@ -76,7 +76,6 @@ async function ensureReservation(item, token) {
 
   console.log(`🎲 Atualizando reserva da rifa ${raffleId}: ${numerosAtuais.length} → ${qtdDesejada}`);
 
-  // 🔹 Aumentou → gera novos
   if (numerosAtuais.length < qtdDesejada) {
     const faltando = qtdDesejada - numerosAtuais.length;
     const gen = await RafflesAPI.generate(raffleId, faltando, token);
@@ -84,12 +83,10 @@ async function ensureReservation(item, token) {
     numerosAtuais.push(...novos);
   }
 
-  // 🔹 Diminuiu → corta excedentes
   if (numerosAtuais.length > qtdDesejada) {
     numerosAtuais = numerosAtuais.slice(0, qtdDesejada);
   }
 
-  // 🔹 Reserva os números atualizados
   const res = await RafflesAPI.reserve(raffleId, numerosAtuais, token);
   const reserved = res?.numeros || res?.numbers || numerosAtuais;
 
@@ -148,7 +145,6 @@ function renderCart() {
   );
   if (totalEl) totalEl.textContent = BRL(total);
 
-  // Eventos de + e −
   document.querySelectorAll(".qty-btn").forEach((btn) => {
     btn.addEventListener("click", async (e) => {
       const idx = Number(e.currentTarget.dataset.index);
@@ -169,7 +165,6 @@ function renderCart() {
     });
   });
 
-  // Evento: remover
   document.querySelectorAll(".remove-btn").forEach((btn) => {
     btn.addEventListener("click", (e) => {
       const idx = Number(e.currentTarget.dataset.index);
@@ -185,11 +180,10 @@ function renderCart() {
   updateBadge();
 }
 
-// Render inicial
 document.addEventListener("DOMContentLoaded", renderCart);
 
 // ============================================================
-// 💳 Finalizar compra (corrigido para SDK Mercado Pago v2)
+// 💳 Finalizar compra (compatível com orderController v8.6)
 // ============================================================
 document.getElementById("checkout")?.addEventListener("click", async () => {
   const token = getToken();
@@ -208,13 +202,11 @@ document.getElementById("checkout")?.addEventListener("click", async () => {
   }
 
   try {
-    // 🔹 Atualiza reservas
     for (const item of cart) await ensureReservation(item, token);
 
     saveCart(cart);
     updateBadge();
 
-    // 🔹 Normaliza payload
     const normalizedCart = cart.map((item) => ({
       raffleId: item._id || item.raffleId || item.id,
       title: item.title || "Rifa BlinkGames",
@@ -223,23 +215,31 @@ document.getElementById("checkout")?.addEventListener("click", async () => {
       numeros: Array.isArray(item.numbers) ? item.numbers : [],
     }));
 
-    // 🔹 Cria checkout
     const result = await CheckoutAPI.create({ cart: normalizedCart }, token);
     console.log("🧾 Retorno do backend:", result);
 
-    // 🔁 Corrige leitura para SDK MP v2
+    // 🔁 Corrigido para resposta do backend v8.6 (init_point + preference_id)
     const initPoint =
       result?.init_point ||
       result?.body?.init_point ||
+      result?.sandbox_init_point ||
       result?.preference?.init_point ||
-      result?.sandbox_init_point;
+      result?.initPoint ||
+      null;
+
+    const prefId =
+      result?.preference_id ||
+      result?.id ||
+      result?.body?.id ||
+      null;
 
     if (initPoint) {
+      console.log("✅ Checkout pronto:", { prefId, initPoint });
       localStorage.setItem("checkoutCache", JSON.stringify(cart));
       window.location.href = initPoint;
     } else {
       console.error("❌ Checkout inválido:", result);
-      alert("Erro ao criar checkout (resposta inesperada do servidor).");
+      alert("Erro ao criar checkout. O servidor não retornou o link de pagamento.");
     }
   } catch (err) {
     console.error("❌ Erro no checkout/reserva:", err);
