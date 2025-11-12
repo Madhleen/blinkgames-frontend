@@ -1,5 +1,5 @@
 // ============================================================
-// 🛒 BlinkGames — cart.js (v10.0 Final — Checkout Corrigido + Neon UI)
+// 🛒 BlinkGames — cart.js (v10.1 Final — Checkout Fix + Logs Mercado Pago)
 // ============================================================
 
 import { mountHeader } from "./header.js";
@@ -41,30 +41,6 @@ updateBadge();
 })();
 
 // ============================================================
-// 🧹 Sanitiza carrinho (garante consistência dos itens)
-// ============================================================
-try {
-  const raw = localStorage.getItem("blink_cart");
-  if (raw) {
-    const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed)) throw new Error("bad cart");
-    const normalized = parsed.map((it) => ({
-      title: it.title || "Rifa BlinkGames",
-      price: Number(it.price) || 1,
-      quantity: Math.max(1, Number(it.quantity) || 1),
-      numbers: Array.isArray(it.numbers) ? it.numbers : [],
-      _id: it._id || it.raffleId || it.id,
-      raffleId: it.raffleId || it._id || it.id,
-      id: it.id || it._id || it.raffleId,
-    }));
-    localStorage.setItem("blink_cart", JSON.stringify(normalized));
-  }
-} catch {
-  localStorage.removeItem("blink_cart");
-}
-updateBadge();
-
-// ============================================================
 // 🔐 Reserva dinâmica de números
 // ============================================================
 async function ensureReservation(item, token) {
@@ -101,7 +77,6 @@ function renderCart() {
   const list = document.getElementById("list");
   const empty = document.getElementById("empty");
   const totalEl = document.getElementById("total");
-
   const cart = getCart();
 
   if (!cart || cart.length === 0) {
@@ -115,17 +90,14 @@ function renderCart() {
   if (empty) empty.style.display = "none";
 
   if (list) {
-    list.innerHTML = cart
-      .map(
-        (item, i) => `
+    list.innerHTML = cart.map(
+      (item, i) => `
       <li class="panel" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
         <div>
           <strong>${item.title}</strong><br>
-          <small style="color:#aaa;">${
-            item.numbers?.length
-              ? item.numbers.join(", ")
-              : "Números reservados serão gerados"
-          }</small>
+          <small style="color:#aaa;">
+            ${item.numbers?.length ? item.numbers.join(", ") : "Números reservados serão gerados"}
+          </small>
           <div class="qty-wrap">
             <button class="qty-btn" data-action="dec" data-index="${i}">−</button>
             <span id="qty-${i}" style="min-width:28px;text-align:center">${item.quantity}</span>
@@ -133,16 +105,12 @@ function renderCart() {
             <button class="remove-btn" data-index="${i}">🗑️</button>
           </div>
         </div>
-        <strong>${BRL((Number(item.price)||1) * (Number(item.quantity)||1))}</strong>
+        <strong>${BRL((Number(item.price) || 1) * (Number(item.quantity) || 1))}</strong>
       </li>`
-      )
-      .join("");
+    ).join("");
   }
 
-  const total = cart.reduce(
-    (sum, it) => sum + (Number(it.price) || 1) * (Number(it.quantity) || 1),
-    0
-  );
+  const total = cart.reduce((sum, it) => sum + (Number(it.price) || 1) * (Number(it.quantity) || 1), 0);
   if (totalEl) totalEl.textContent = BRL(total);
 
   document.querySelectorAll(".qty-btn").forEach((btn) => {
@@ -151,7 +119,6 @@ function renderCart() {
       const action = e.currentTarget.dataset.action;
       const items = getCart();
       if (!items[idx]) return;
-
       const current = Number(items[idx].quantity) || 1;
       const newQty = action === "inc" ? current + 1 : Math.max(1, current - 1);
       items[idx].quantity = newQty;
@@ -183,7 +150,7 @@ function renderCart() {
 document.addEventListener("DOMContentLoaded", renderCart);
 
 // ============================================================
-// 💳 Finalizar compra (compatível com orderController v8.6)
+// 💳 Finalizar compra (corrigido 100% Mercado Pago SDK v2)
 // ============================================================
 document.getElementById("checkout")?.addEventListener("click", async () => {
   const token = getToken();
@@ -218,23 +185,26 @@ document.getElementById("checkout")?.addEventListener("click", async () => {
     const result = await CheckoutAPI.create({ cart: normalizedCart }, token);
     console.log("🧾 Retorno do backend:", result);
 
-    // 🔁 Corrigido para resposta do backend v8.6 (init_point + preference_id)
+    // 🔍 Captura todas as formas possíveis de init_point
     const initPoint =
       result?.init_point ||
       result?.body?.init_point ||
+      result?.response?.init_point ||
+      result?.response?.body?.init_point ||
+      result?.data?.init_point ||
       result?.sandbox_init_point ||
-      result?.preference?.init_point ||
-      result?.initPoint ||
       null;
 
     const prefId =
       result?.preference_id ||
+      result?.body?.preference_id ||
       result?.id ||
-      result?.body?.id ||
       null;
 
+    console.log("🧩 initPoint detectado:", initPoint);
+    console.log("📦 preference_id:", prefId);
+
     if (initPoint) {
-      console.log("✅ Checkout pronto:", { prefId, initPoint });
       localStorage.setItem("checkoutCache", JSON.stringify(cart));
       window.location.href = initPoint;
     } else {
