@@ -1,5 +1,5 @@
 // ============================================================
-// 🛒 BlinkGames — cart.js (v10.2 FINAL — Checkout Fix Definitivo)
+// 🛒 BlinkGames — cart.js (v10.1 Final — Checkout Fix + Logs Mercado Pago)
 // ============================================================
 
 import { mountHeader } from "./header.js";
@@ -50,9 +50,7 @@ async function ensureReservation(item, token) {
   let numerosAtuais = Array.isArray(item.numbers) ? item.numbers : [];
   const qtdDesejada = item.quantity || 1;
 
-  console.log(
-    `🎲 Atualizando reserva da rifa ${raffleId}: ${numerosAtuais.length} → ${qtdDesejada}`
-  );
+  console.log(`🎲 Atualizando reserva da rifa ${raffleId}: ${numerosAtuais.length} → ${qtdDesejada}`);
 
   if (numerosAtuais.length < qtdDesejada) {
     const faltando = qtdDesejada - numerosAtuais.length;
@@ -92,9 +90,8 @@ function renderCart() {
   if (empty) empty.style.display = "none";
 
   if (list) {
-    list.innerHTML = cart
-      .map(
-        (item, i) => `
+    list.innerHTML = cart.map(
+      (item, i) => `
       <li class="panel" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
         <div>
           <strong>${item.title}</strong><br>
@@ -108,33 +105,22 @@ function renderCart() {
             <button class="remove-btn" data-index="${i}">🗑️</button>
           </div>
         </div>
-        <strong>${BRL(
-          (Number(item.price) || 1) * (Number(item.quantity) || 1)
-        )}</strong>
+        <strong>${BRL((Number(item.price) || 1) * (Number(item.quantity) || 1))}</strong>
       </li>`
-      )
-      .join("");
+    ).join("");
   }
 
-  const total = cart.reduce(
-    (sum, it) =>
-      sum + (Number(it.price) || 1) * (Number(it.quantity) || 1),
-    0
-  );
+  const total = cart.reduce((sum, it) => sum + (Number(it.price) || 1) * (Number(it.quantity) || 1), 0);
   if (totalEl) totalEl.textContent = BRL(total);
 
   document.querySelectorAll(".qty-btn").forEach((btn) => {
     btn.addEventListener("click", async (e) => {
       const idx = Number(e.currentTarget.dataset.index);
       const action = e.currentTarget.dataset.action;
-
       const items = getCart();
       if (!items[idx]) return;
-
       const current = Number(items[idx].quantity) || 1;
-      const newQty =
-        action === "inc" ? current + 1 : Math.max(1, current - 1);
-
+      const newQty = action === "inc" ? current + 1 : Math.max(1, current - 1);
       items[idx].quantity = newQty;
 
       const token = getToken();
@@ -151,7 +137,6 @@ function renderCart() {
       const idx = Number(e.currentTarget.dataset.index);
       const items = getCart();
       if (!items[idx]) return;
-
       items.splice(idx, 1);
       saveCart(items);
       updateBadge();
@@ -165,7 +150,7 @@ function renderCart() {
 document.addEventListener("DOMContentLoaded", renderCart);
 
 // ============================================================
-// 💳 FINALIZAR COMPRA — 100% alinhado com o BACKEND FIXADO
+// 💳 Finalizar compra (corrigido 100% Mercado Pago SDK v2)
 // ============================================================
 document.getElementById("checkout")?.addEventListener("click", async () => {
   const token = getToken();
@@ -184,13 +169,11 @@ document.getElementById("checkout")?.addEventListener("click", async () => {
   }
 
   try {
-    // Atualiza/gera reservas antes do checkout
     for (const item of cart) await ensureReservation(item, token);
 
     saveCart(cart);
     updateBadge();
 
-    // Normaliza carrinho
     const normalizedCart = cart.map((item) => ({
       raffleId: item._id || item.raffleId || item.id,
       title: item.title || "Rifa BlinkGames",
@@ -199,61 +182,44 @@ document.getElementById("checkout")?.addEventListener("click", async () => {
       numeros: Array.isArray(item.numbers) ? item.numbers : [],
     }));
 
-    const result = await CheckoutAPI.create(
-      { cart: normalizedCart },
-      token
-    );
-
+    const result = await CheckoutAPI.create({ cart: normalizedCart }, token);
     console.log("🧾 Retorno do backend:", result);
 
-    // ============================================================
-    // 🔍 Compatibilidade universal — pega TODOS os formatos possíveis
-    // ============================================================
+    // 🔍 Captura todas as formas possíveis de init_point
     const initPoint =
       result?.init_point ||
-      result?.checkoutUrl ||
+      result?.body?.init_point ||
       result?.response?.init_point ||
+      result?.response?.body?.init_point ||
       result?.data?.init_point ||
       result?.sandbox_init_point ||
       null;
 
     const prefId =
       result?.preference_id ||
-      result?.preferenceId ||
-      result?.response?.preference_id ||
+      result?.body?.preference_id ||
       result?.id ||
       null;
 
     console.log("🧩 initPoint detectado:", initPoint);
     console.log("📦 preference_id:", prefId);
 
-    // ============================================================
-    // 🚀 Redireciona para pagamento
-    // ============================================================
     if (initPoint) {
       localStorage.setItem("checkoutCache", JSON.stringify(cart));
       window.location.href = initPoint;
-      return;
+    } else {
+      console.error("❌ Checkout inválido:", result);
+      alert("Erro ao criar checkout. O servidor não retornou o link de pagamento.");
     }
-
-    // ============================================================
-    // ❌ Falha — backend não respondeu com link válido
-    // ============================================================
-    console.error("❌ Checkout inválido:", result);
-    alert(
-      "Erro ao criar checkout. O servidor não retornou o link de pagamento."
-    );
   } catch (err) {
     console.error("❌ Erro no checkout/reserva:", err);
     const msg = String(err?.message || "").toLowerCase();
-
     if (msg.includes("unauthorized") || msg.includes("token")) {
       alert("Sessão expirada. Faça login novamente.");
       localStorage.clear();
       window.location.href = "conta.html";
       return;
     }
-
     alert(err.message || "Erro ao reservar/criar checkout.");
   }
 });
