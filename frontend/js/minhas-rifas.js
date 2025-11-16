@@ -1,5 +1,5 @@
 // ============================================================
-// 🎟️ BlinkGames — minhas-rifas.js (v3.0 FINAL Produção)
+// 🎟️ BlinkGames — minhas-rifas.js (v4.0 — FIX TOTAL Backend v10)
 // ============================================================
 
 import { getToken, BRL } from "./state.js";
@@ -30,31 +30,47 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
-    // Renderiza cada compra com seus números e dados
+    // ============================================================
+    // 🔥 AQUI ESTAVA O BUG!!!
+    // order.items → NÃO EXISTE
+    // Backend usa: order.itens
+    // ============================================================
+
     rifaList.innerHTML = orders
-      .map(
-        (order) => `
+      .map((order) => {
+        const primeiroItem = order.itens?.[0];
+
+        return `
         <li class="panel" style="margin-bottom: 14px;">
-          <strong>🎮 ${order.items?.[0]?.title || "Rifa BlinkGames"}</strong><br>
-          <small>Status: <strong style="color:${
-            order.status === "approved" ? "#0f0" : "#ffde59"
-          };">${order.status}</strong></small><br>
-          <small>Pagamento: <span style="color:var(--accent-2);">${
-            order.paymentId || "—"
-          }</span></small><br>
+          <strong>🎮 ${primeiroItem?.titulo || "Rifa BlinkGames"}</strong><br>
+
+          <small>Status:
+            <strong style="color:${order.status === "approved" ? "#0f0" : "#ffde59"};">
+              ${order.status}
+            </strong>
+          </small><br>
+
+          <small>Pagamento:
+            <span style="color:var(--accent-2);">
+              ${order.paymentId || "—"}
+            </span>
+          </small><br>
+
           <small>Valor: <strong>${BRL(order.total || 0)}</strong></small><br>
+
           <small>Data: ${new Date(order.createdAt).toLocaleDateString("pt-BR")}</small>
 
           <p style="margin-top:8px;">
             <strong>Números:</strong><br>
             ${
-              order.items?.flatMap((i) => i.numeros || []).join(", ") ||
-              "Nenhum número registrado."
+              order.itens
+                ?.flatMap((i) => i.numeros || [])
+                .join(", ") || "Nenhum número registrado."
             }
           </p>
         </li>
-      `
-      )
+      `;
+      })
       .join("");
   } catch (err) {
     console.error("❌ Erro ao carregar rifas:", err);
