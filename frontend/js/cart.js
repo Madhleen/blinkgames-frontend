@@ -1,5 +1,5 @@
 // ============================================================
-// 🛒 BlinkGames — cart.js (v10.2 FINAL — Checkout Fix Definitivo)
+// 🛒 BlinkGames — cart.js (v10.3 — Checkout Fix Real Oficial)
 // ============================================================
 
 import { mountHeader } from "./header.js";
@@ -13,7 +13,7 @@ mountHeader();
 updateBadge();
 
 // ============================================================
-// 🎨 Estilo inline — botões estilizados neon
+// 🎨 Estilo inline — botões neon
 // ============================================================
 (function injectCartStyles() {
   if (document.getElementById("cart-inline-styles")) return;
@@ -41,7 +41,7 @@ updateBadge();
 })();
 
 // ============================================================
-// 🔐 Reserva dinâmica de números
+// 🔐 Reserva dinâmica
 // ============================================================
 async function ensureReservation(item, token) {
   const raffleId = item._id || item.raffleId || item.id;
@@ -50,15 +50,10 @@ async function ensureReservation(item, token) {
   let numerosAtuais = Array.isArray(item.numbers) ? item.numbers : [];
   const qtdDesejada = item.quantity || 1;
 
-  console.log(
-    `🎲 Atualizando reserva da rifa ${raffleId}: ${numerosAtuais.length} → ${qtdDesejada}`
-  );
-
   if (numerosAtuais.length < qtdDesejada) {
     const faltando = qtdDesejada - numerosAtuais.length;
     const gen = await RafflesAPI.generate(raffleId, faltando, token);
-    const novos = gen?.numeros || gen?.numbers || [];
-    numerosAtuais.push(...novos);
+    numerosAtuais.push(...(gen?.numeros || gen?.numbers || []));
   }
 
   if (numerosAtuais.length > qtdDesejada) {
@@ -66,10 +61,8 @@ async function ensureReservation(item, token) {
   }
 
   const res = await RafflesAPI.reserve(raffleId, numerosAtuais, token);
-  const reserved = res?.numeros || res?.numbers || numerosAtuais;
-
-  item.numbers = reserved;
-  return reserved;
+  item.numbers = res?.numeros || res?.numbers || numerosAtuais;
+  return item.numbers;
 }
 
 // ============================================================
@@ -108,17 +101,14 @@ function renderCart() {
             <button class="remove-btn" data-index="${i}">🗑️</button>
           </div>
         </div>
-        <strong>${BRL(
-          (Number(item.price) || 1) * (Number(item.quantity) || 1)
-        )}</strong>
+        <strong>${BRL(Number(item.price) * Number(item.quantity))}</strong>
       </li>`
       )
       .join("");
   }
 
   const total = cart.reduce(
-    (sum, it) =>
-      sum + (Number(it.price) || 1) * (Number(it.quantity) || 1),
+    (sum, it) => sum + Number(it.price) * Number(it.quantity),
     0
   );
   if (totalEl) totalEl.textContent = BRL(total);
@@ -131,9 +121,8 @@ function renderCart() {
       const items = getCart();
       if (!items[idx]) return;
 
-      const current = Number(items[idx].quantity) || 1;
-      const newQty =
-        action === "inc" ? current + 1 : Math.max(1, current - 1);
+      const current = Number(items[idx].quantity);
+      const newQty = action === "inc" ? current + 1 : Math.max(1, current - 1);
 
       items[idx].quantity = newQty;
 
@@ -150,7 +139,6 @@ function renderCart() {
     btn.addEventListener("click", (e) => {
       const idx = Number(e.currentTarget.dataset.index);
       const items = getCart();
-      if (!items[idx]) return;
 
       items.splice(idx, 1);
       saveCart(items);
@@ -165,14 +153,14 @@ function renderCart() {
 document.addEventListener("DOMContentLoaded", renderCart);
 
 // ============================================================
-// 💳 FINALIZAR COMPRA — 100% alinhado com o BACKEND FIXADO
+// 💳 FINALIZAR COMPRA — COMPATÍVEL COM BACKEND PADRÃO
 // ============================================================
 document.getElementById("checkout")?.addEventListener("click", async () => {
   const token = getToken();
   const cart = getCart();
 
   if (!token) {
-    alert("⚠️ Você precisa estar logado para finalizar a compra!");
+    alert("⚠️ Você precisa estar logado!");
     localStorage.setItem("redirectAfterLogin", "carrinho.html");
     window.location.href = "conta.html";
     return;
@@ -184,19 +172,17 @@ document.getElementById("checkout")?.addEventListener("click", async () => {
   }
 
   try {
-    // Atualiza/gera reservas antes do checkout
     for (const item of cart) await ensureReservation(item, token);
 
     saveCart(cart);
     updateBadge();
 
-    // Normaliza carrinho
     const normalizedCart = cart.map((item) => ({
       raffleId: item._id || item.raffleId || item.id,
-      title: item.title || "Rifa BlinkGames",
-      price: Number(item.price) || 1,
-      quantity: Math.max(1, Number(item.quantity) || 1),
-      numeros: Array.isArray(item.numbers) ? item.numbers : [],
+      title: item.title,
+      price: Number(item.price),
+      quantity: Number(item.quantity),
+      numeros: item.numbers || [],
     }));
 
     const result = await CheckoutAPI.create(
@@ -204,57 +190,25 @@ document.getElementById("checkout")?.addEventListener("click", async () => {
       token
     );
 
-    console.log("🧾 Retorno do backend:", result);
+    console.log("🧾 Backend:", result);
 
-    // ============================================================
-    // 🔍 Compatibilidade universal — pega TODOS os formatos possíveis
-    // ============================================================
     const initPoint =
       result?.init_point ||
-      result?.checkoutUrl ||
-      result?.response?.init_point ||
-      result?.data?.init_point ||
       result?.sandbox_init_point ||
+      result?.checkoutUrl ||
       null;
 
-    const prefId =
-      result?.preference_id ||
-      result?.preferenceId ||
-      result?.response?.preference_id ||
-      result?.id ||
-      null;
-
-    console.log("🧩 initPoint detectado:", initPoint);
-    console.log("📦 preference_id:", prefId);
-
-    // ============================================================
-    // 🚀 Redireciona para pagamento
-    // ============================================================
     if (initPoint) {
       localStorage.setItem("checkoutCache", JSON.stringify(cart));
       window.location.href = initPoint;
       return;
     }
 
-    // ============================================================
-    // ❌ Falha — backend não respondeu com link válido
-    // ============================================================
-    console.error("❌ Checkout inválido:", result);
-    alert(
-      "Erro ao criar checkout. O servidor não retornou o link de pagamento."
-    );
+    console.error("❌ Sem init_point:", result);
+    alert("Erro: o servidor não enviou o link de pagamento.");
   } catch (err) {
-    console.error("❌ Erro no checkout/reserva:", err);
-    const msg = String(err?.message || "").toLowerCase();
-
-    if (msg.includes("unauthorized") || msg.includes("token")) {
-      alert("Sessão expirada. Faça login novamente.");
-      localStorage.clear();
-      window.location.href = "conta.html";
-      return;
-    }
-
-    alert(err.message || "Erro ao reservar/criar checkout.");
+    console.error("❌ Erro no checkout:", err);
+    alert("Erro ao criar checkout.");
   }
 });
 

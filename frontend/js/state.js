@@ -1,5 +1,5 @@
 // ============================================================
-// 🎮 BlinkGames — state.js (v6.2 TOTALMENTE SINCRONIZADO)
+// 🎮 BlinkGames — state.js (v6.3 — Sincronizado com cart + api)
 // ============================================================
 
 // 💰 Formata valores em Real
@@ -16,9 +16,9 @@ export function BRL(n) {
 // ============================================================
 export function getCart() {
   try {
-    const data = localStorage.getItem("blink_cart");
-    const cart = JSON.parse(data || "[]");
-    return Array.isArray(cart) ? cart : [];
+    const raw = localStorage.getItem("blink_cart");
+    const c = JSON.parse(raw || "[]");
+    return Array.isArray(c) ? c : [];
   } catch {
     return [];
   }
@@ -27,7 +27,6 @@ export function getCart() {
 export function saveCart(c) {
   localStorage.setItem("blink_cart", JSON.stringify(c || []));
   updateBadge();
-  // 🔄 Dispara evento pra header.js atualizar badge em tempo real
   window.dispatchEvent(new Event("storage"));
 }
 
@@ -39,18 +38,17 @@ export function clearCart() {
 
 export function updateBadge() {
   const badge = document.getElementById("cart-badge");
-  if (!badge) return;
-
   const cart = getCart();
-  const totalItens = cart.reduce((acc, i) => acc + (i.quantity || 0), 0);
 
-  badge.textContent = totalItens > 0 ? totalItens : "";
+  const total = cart.reduce((sum, it) => sum + (it.quantity || 0), 0);
 
-  // Atualiza também o texto do link “Carrinho”
-  const linkCarrinho = document.querySelector('a[href="carrinho.html"]');
-  if (linkCarrinho) {
-    linkCarrinho.innerHTML = `
-      Carrinho <span id="cart-badge" class="badge">${totalItens > 0 ? totalItens : ""}</span>
+  if (badge) badge.textContent = total > 0 ? total : "";
+
+  // Atualiza também o link do header
+  const link = document.querySelector('a[href="carrinho.html"]');
+  if (link) {
+    link.innerHTML = `
+      Carrinho <span id="cart-badge" class="badge">${total > 0 ? total : ""}</span>
     `;
   }
 }
@@ -91,7 +89,7 @@ export function clearAuth() {
 export function updateUserHeader() {
   const user = getUser();
   const nome = user?.nome || user?.name || "";
-  const logado = !!getToken() && !!nome;
+  const logado = !!getToken() && nome.length > 0;
 
   const headerUser = document.getElementById("header-user");
   const headerAuth = document.getElementById("header-auth");
@@ -106,7 +104,9 @@ export function updateUserHeader() {
     headerUser.style.display = "flex";
     headerAuth.style.display = "none";
 
-    document.getElementById("logout-btn")?.addEventListener("click", clearAuth);
+    document
+      .getElementById("logout-btn")
+      ?.addEventListener("click", clearAuth);
   } else {
     headerUser.style.display = "none";
     headerAuth.style.display = "flex";
@@ -118,8 +118,5 @@ export function updateUserHeader() {
 // ============================================================
 // 🚀 Inicialização global
 // ============================================================
-document.addEventListener("DOMContentLoaded", () => {
-  updateBadge();
-  updateUserHeader();
-});
+document.addEventL
 
