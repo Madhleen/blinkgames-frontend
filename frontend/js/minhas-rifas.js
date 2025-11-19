@@ -1,5 +1,5 @@
 // ============================================================
-// 🎟️ BlinkGames — minhas-rifas.js (v4.0 — FIX TOTAL Backend v10)
+// 🎟️ BlinkGames — minhas-rifas.js (v5.0 — usando order.cart)
 // ============================================================
 
 import { getToken, BRL } from "./state.js";
@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   try {
-    const orders = await OrdersAPI.getMyOrders(token);
+    let orders = await OrdersAPI.getMyOrders(token);
     console.log("📦 Compras recebidas:", orders);
 
     if (!orders || !orders.length) {
@@ -30,43 +30,56 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
-    // ============================================================
-    // 🔥 AQUI ESTAVA O BUG!!!
-    // order.items → NÃO EXISTE
-    // Backend usa: order.itens
-    // ============================================================
+    // Garante mais recente primeiro (caso o backend não ordene)
+    orders = orders.sort(
+      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+    );
 
     rifaList.innerHTML = orders
       .map((order) => {
-        const primeiroItem = order.itens?.[0];
+        const items = order.cart || order.itens || [];
+        const primeiroItem = items[0] || {};
+
+        const titulo =
+          primeiroItem.title ||
+          primeiroItem.titulo ||
+          "Rifa BlinkGames";
+
+        const numeros =
+          items
+            .flatMap((i) => i.numeros || i.numbers || [])
+            .join(", ") || "Nenhum número registrado.";
+
+        const statusColor =
+          order.status === "approved" ? "#0f0" : "#ffde59";
 
         return `
         <li class="panel" style="margin-bottom: 14px;">
-          <strong>🎮 ${primeiroItem?.titulo || "Rifa BlinkGames"}</strong><br>
+          <strong>🎮 ${titulo}</strong><br>
 
           <small>Status:
-            <strong style="color:${order.status === "approved" ? "#0f0" : "#ffde59"};">
+            <strong style="color:${statusColor};">
               ${order.status}
             </strong>
           </small><br>
 
           <small>Pagamento:
             <span style="color:var(--accent-2);">
-              ${order.paymentId || "—"}
+              ${order.mpPaymentId || order.paymentId || "—"}
             </span>
           </small><br>
 
           <small>Valor: <strong>${BRL(order.total || 0)}</strong></small><br>
 
-          <small>Data: ${new Date(order.createdAt).toLocaleDateString("pt-BR")}</small>
+          <small>Data: ${
+            order.createdAt
+              ? new Date(order.createdAt).toLocaleDateString("pt-BR")
+              : "-"
+          }</small>
 
           <p style="margin-top:8px;">
             <strong>Números:</strong><br>
-            ${
-              order.itens
-                ?.flatMap((i) => i.numeros || [])
-                .join(", ") || "Nenhum número registrado."
-            }
+            ${numeros}
           </p>
         </li>
       `;
