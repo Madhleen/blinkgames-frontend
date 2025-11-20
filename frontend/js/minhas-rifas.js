@@ -1,5 +1,5 @@
 // ============================================================
-// 🎟️ BlinkGames — minhas-rifas.js (v5.0 — usando order.cart)
+// 🎟️ BlinkGames — minhas-rifas.js (v6.0 — só pedidos aprovados, usando order.cart)
 // ============================================================
 
 import { getToken, BRL } from "./state.js";
@@ -23,21 +23,32 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   try {
     let orders = await OrdersAPI.getMyOrders(token);
-    console.log("📦 Compras recebidas:", orders);
+    console.log("📦 Compras recebidas (todas):", orders);
 
     if (!orders || !orders.length) {
       rifaList.innerHTML = `<p style="opacity:.8;">Você ainda não possui rifas compradas.</p>`;
       return;
     }
 
-    // Garante mais recente primeiro (caso o backend não ordene)
+    // 🔥 Só quero pedidos APROVADOS (pagos de verdade)
+    orders = orders.filter((o) => o.status === "approved");
+
+    if (!orders.length) {
+      rifaList.innerHTML = `<p style="opacity:.8;">Você ainda não possui rifas aprovadas.</p>`;
+      return;
+    }
+
+    // Mais recente primeiro
     orders = orders.sort(
       (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
     );
 
     rifaList.innerHTML = orders
       .map((order) => {
-        const items = order.cart || order.itens || [];
+        const items = order.cart && order.cart.length
+          ? order.cart
+          : (order.itens || []);
+
         const primeiroItem = items[0] || {};
 
         const titulo =
@@ -50,8 +61,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             .flatMap((i) => i.numeros || i.numbers || [])
             .join(", ") || "Nenhum número registrado.";
 
-        const statusColor =
-          order.status === "approved" ? "#0f0" : "#ffde59";
+        const statusColor = "#0f0"; // aqui sempre approved
 
         return `
         <li class="panel" style="margin-bottom: 14px;">
